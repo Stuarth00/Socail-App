@@ -1,10 +1,16 @@
+export interface State {
+  users: User[];
+  currentUser: User | null;
+}
+
 export interface User {
   id: string;
-  userName: string;
+  first_name: string;
+  last_name: string;
   email: string;
-  avatar?: string;
-  genre: string;
-  DateOfBirth: Date;
+  // avatar?: string;
+  // genre: string;
+  DateOfBirth: string;
   password: string;
 }
 

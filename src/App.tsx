@@ -5,6 +5,7 @@ import UserProfile from "./Pages/UserProfile";
 
 import "./App.css";
 import { AppProvider } from "./Context/GlobalState";
+import Search from "./Pages/Search";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomeFeed />} />
           <Route path="/auth" element={<AuthorizationPage />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/user-profile" element={<UserProfile />} />
         </Routes>
       </div>

@@ -1,10 +1,13 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useContext, useState, type ChangeEvent, type FormEvent } from "react";
+import { AppContext } from "../../Context/GlobalState";
 
 interface SignupFormData {
   first_name: string;
   last_name: string;
   email: string;
-  birth: string;
+  // avatar?: string;
+  // genre: string;
+  DateOfBirth: string;
   password: string;
 }
 
@@ -12,12 +15,14 @@ const initial_form: SignupFormData = {
   first_name: "",
   last_name: "",
   email: "",
-  birth: "",
+  DateOfBirth: "",
   password: "",
 };
 
 function Signup() {
   const [formData, setFormData] = useState<SignupFormData>(initial_form);
+
+  const { dispatch } = useContext(AppContext);
 
   const hanldeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -25,12 +30,18 @@ function Signup() {
       ...prevData,
       [name]: type === "number" ? Number(value) : value,
     }));
-    console.log(name, value);
   };
 
   const hanldeSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormData(initial_form);
+    dispatch({
+      type: "REGISTER_USER",
+      payload: {
+        ...formData,
+        id: crypto.randomUUID(),
+      },
+    });
   };
 
   return (
@@ -90,8 +101,8 @@ function Signup() {
         <input
           type="date"
           id="birth"
-          name="birth"
-          value={formData.birth}
+          name="DateOfBirth"
+          value={formData.DateOfBirth}
           onChange={hanldeChange}
           required
           className="bg-lime-950 p-2 rounded-md"
