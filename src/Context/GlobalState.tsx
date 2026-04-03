@@ -27,7 +27,12 @@ function authReducer(state: State, action: Action): State {
   switch (action.type) {
     case "REGISTER_USER":
       console.log("Reducer called with action:", action);
-      return { ...state, users: [...state.users, action.payload] };
+      console.log("Initial state:", initialState);
+      return {
+        ...state,
+        users: [...state.users, action.payload],
+        currentUser: action.payload,
+      };
     case "LOGIN_USER":
       console.log("Reducer called with action:", action);
       return { ...state, currentUser: action.payload };
@@ -38,8 +43,6 @@ function authReducer(state: State, action: Action): State {
       return state;
   }
 }
-
-console.log("Initial state:", initialState);
 
 export const AppContext = createContext<AppProviderType>({} as AppProviderType);
 

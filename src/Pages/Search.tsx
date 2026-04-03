@@ -5,6 +5,7 @@ import { AppContext } from "../Context/GlobalState";
 function Search() {
   const { state } = useContext(AppContext);
   console.log(state.users);
+  console.log("current user in search page", state.currentUser);
   return (
     <div>
       <Layout>
@@ -16,6 +17,14 @@ function Search() {
               {user.first_name} {user.last_name}
             </li>
           ))}
+        </ul>
+        <ul>
+          {state.currentUser ? (
+            <li>
+              Current User: {state.currentUser.first_name}{" "}
+              {state.currentUser.last_name}
+            </li>
+          ) : null}
         </ul>
       </Layout>
     </div>

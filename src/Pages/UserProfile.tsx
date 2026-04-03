@@ -1,5 +1,14 @@
+import Layout from "../Component/Layout";
+import ProfilePage from "../Component/ProfilePage/profilePage";
+
 function UserProfile() {
-  return <div>Your posts, information and more will be here</div>;
+  return (
+    <div>
+      <Layout>
+        <ProfilePage />
+      </Layout>
+    </div>
+  );
 }
 
 export default UserProfile;

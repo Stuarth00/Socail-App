@@ -1,5 +1,6 @@
 import { useContext, useState, type ChangeEvent, type FormEvent } from "react";
 import { AppContext } from "../../Context/GlobalState";
+import { useNavigate } from "react-router-dom";
 
 interface SignupFormData {
   first_name: string;
@@ -22,7 +23,8 @@ const initial_form: SignupFormData = {
 function Signup() {
   const [formData, setFormData] = useState<SignupFormData>(initial_form);
 
-  const { dispatch } = useContext(AppContext);
+  const { state, dispatch } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const hanldeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
@@ -34,7 +36,14 @@ function Signup() {
 
   const hanldeSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setFormData(initial_form);
+
+    const emailExists = state.users.some(
+      (user) => user.email === formData.email,
+    );
+    if (emailExists) {
+      alert("Email already exists. Please use a different email.");
+      return;
+    }
     dispatch({
       type: "REGISTER_USER",
       payload: {
@@ -42,6 +51,8 @@ function Signup() {
         id: crypto.randomUUID(),
       },
     });
+    setFormData(initial_form);
+    navigate("/");
   };
 
   return (

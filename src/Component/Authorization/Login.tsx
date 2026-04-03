@@ -1,4 +1,5 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState, useContext, type ChangeEvent, type FormEvent } from "react";
+import { AppContext } from "../../Context/GlobalState";
 
 interface LoginFormData {
   email: string;
@@ -12,6 +13,7 @@ const initial_form: LoginFormData = {
 
 function Login() {
   const [formData, setFormData] = useState<LoginFormData>(initial_form);
+  const { state, dispatch } = useContext(AppContext);
 
   const hanldeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -23,6 +25,21 @@ function Login() {
 
   const hanldeSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const validAccess = state.users.find(
+      (user) =>
+        user.email === formData.email && user.password === formData.password,
+    );
+
+    if (validAccess) {
+      dispatch({
+        type: "LOGIN_USER",
+        payload: validAccess,
+      });
+    } else {
+      alert("Invalid email or password. Please try again.");
+    }
+
     setFormData(initial_form);
   };
   return (
