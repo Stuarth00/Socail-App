@@ -2,7 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useEffect, useReducer, useState } from "react";
-import { type User, type State } from "../Types/Interafaces";
+import { type User, type State, type Post } from "../Types/Interafaces";
 import { ClipLoader } from "react-spinners";
 // import { set } from "date-fns";
 
@@ -27,7 +27,8 @@ const initialState: State = {
 type Action =
   | { type: "REGISTER_USER"; payload: User }
   | { type: "LOGIN_USER"; payload: User }
-  | { type: "LOGOUT" };
+  | { type: "LOGOUT" }
+  | { type: "CREATE_POST"; payload: Post };
 
 function authReducer(state: State, action: Action): State {
   switch (action.type) {
@@ -45,6 +46,11 @@ function authReducer(state: State, action: Action): State {
     case "LOGOUT":
       console.log("Reducer called with action:", action);
       return { ...state, currentUser: null };
+    case "CREATE_POST":
+      console.log("Reducer called with action:", action);
+      // Here you would typically add the new post to the current user's posts
+      // For simplicity, we're just logging the action and returning the state unchanged
+      return state;
     default:
       return state;
   }

@@ -21,6 +21,7 @@ export interface Post {
     type: string;
     url: string;
   };
+  description: string;
   likes: string[];
   comments: string[];
 }
