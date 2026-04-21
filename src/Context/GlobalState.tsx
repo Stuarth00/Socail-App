@@ -22,13 +22,15 @@ interface AppProviderType {
 const initialState: State = {
   users: [],
   currentUser: null,
+  posts: [],
 };
 
 type Action =
   | { type: "REGISTER_USER"; payload: User }
   | { type: "LOGIN_USER"; payload: User }
   | { type: "LOGOUT" }
-  | { type: "CREATE_POST"; payload: Post };
+  | { type: "CREATE_POST"; payload: Post }
+  | { type: "UPDATE_PROFILE"; payload: User };
 
 function authReducer(state: State, action: Action): State {
   switch (action.type) {
@@ -47,10 +49,23 @@ function authReducer(state: State, action: Action): State {
       console.log("Reducer called with action:", action);
       return { ...state, currentUser: null };
     case "CREATE_POST":
-      console.log("Reducer called with action:", action);
-      // Here you would typically add the new post to the current user's posts
-      // For simplicity, we're just logging the action and returning the state unchanged
-      return state;
+      if (!state.currentUser) return state;
+
+      return {
+        ...state,
+        posts: Array.isArray(state.posts)
+          ? [...state.posts, action.payload]
+          : [action.payload],
+      };
+    case "UPDATE_PROFILE":
+      if (!state.currentUser) return state;
+      return {
+        ...state,
+        currentUser: action.payload,
+        users: state.users.map((user) =>
+          user.id === action.payload.id ? action.payload : user,
+        ),
+      };
     default:
       return state;
   }

@@ -1,62 +1,69 @@
 import { useState, useContext, type ChangeEvent } from "react";
 import { AppContext } from "../../Context/GlobalState";
-
-// interface CreationPostProps {
-//   content: {
-//     type: string;
-//     url: string;
-//   };
-//   description: string;
-// }
-
-// const initial_data: CreationPostProps = {
-//   content: {
-//     type: "",
-//     url: "",
-//   },
-//   description: "",
-// };
+import type { Post } from "../../Types/Interafaces";
+import heic2any from "heic2any";
 
 function CreationPost() {
-  //   const [formData, setFormData] = useState<CreationPostProps>(initial_data);
-  const { state, dispatch, asyncSimulate, LoadingSpinner } =
-    useContext(AppContext);
+  const { state, dispatch, asyncSimulate } = useContext(AppContext);
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
   const [, setFile] = useState<File | null>(null);
-  const acceptedFormats = "image/*, .HEIC, .HEIF";
+  const acceptedFormats = "image/*, .webp, .avif, .jpeg, .jpg, .png";
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files ? e.target.files[0] : null;
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    let selectedFile = e.target.files ? e.target.files[0] : null;
+    if (!selectedFile) return;
 
-    if (selectedFile) {
+    // 1. Check for HEIC specifically
+    if (
+      selectedFile.name.toLowerCase().endsWith(".heic") ||
+      selectedFile.type === "image/heic"
+    ) {
+      try {
+        // 2. Convert HEIC to JPEG blob
+        const convertedBlob = await heic2any({
+          blob: selectedFile,
+          toType: "image/jpeg",
+          quality: 0.8,
+        });
+
+        // 3. Create a new File object from the blob so it has a name
+        selectedFile = new File(
+          [Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob],
+          selectedFile.name.replace(/\.[^/.]+$/, ".jpg"),
+          { type: "image/jpeg" },
+        );
+      } catch (error) {
+        console.log(error);
+        alert("Brave/Chrome don't support HEIC yet. Please try a PNG or JPEG!");
+        e.target.value = ""; // Clear the input
+        return;
+      }
+    }
+
+    // Your existing logic continues here...
+    if (selectedFile.type.startsWith("image/")) {
       setFile(selectedFile);
-      setImageUrl(URL.createObjectURL(selectedFile));
+      const render = new FileReader();
+      render.onloadend = () => {
+        setImageUrl(render.result as string);
+      };
+      render.readAsDataURL(selectedFile);
     }
   };
 
-  //   const hanldeChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //     const { name, value } = e.target;
-  //     setFormData((prevData) => ({
-  //       ...prevData,
-  //       [name]: value,
-  //     }));
-  //   };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Submitting post with image URL:", imageUrl);
-    handleFileChange(e as unknown as ChangeEvent<HTMLInputElement>);
 
-    const newPost = {
+    const newPost: Post = {
       id: Date.now(),
       authorId: state.currentUser?.id || "unknown",
-      content: {
-        type: "image",
-        url: imageUrl || "",
-      },
-      description: "",
+      contentUrl: imageUrl || "",
+      description: description,
       likes: [],
+      createdAt: new Date().toISOString(),
       comments: [],
     };
 
@@ -65,6 +72,7 @@ function CreationPost() {
         type: "CREATE_POST",
         payload: newPost,
       });
+      setImageUrl(null);
     });
   };
 
@@ -76,12 +84,19 @@ function CreationPost() {
         <input
           id="file-input"
           type="file"
-          //   name="imageUrl"
           onChange={handleFileChange}
-          placeholder="Past your image here"
-          accept={acceptedFormats}
           required
-          className="border p-2 rounded"
+          className="border p-2 rounded m-4"
+          accept={acceptedFormats}
+        />
+
+        <label htmlFor="description">Description:</label>
+
+        <textarea
+          id="description"
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Describe your post..."
+          className="border p-2 rounded m-2"
         />
 
         <button type="submit">Create Post</button>

@@ -1,18 +1,20 @@
 function PostHeader({
   username,
-  avatar,
+  lastname,
 }: {
   username: string;
-  avatar: string;
+  lastname: string;
 }) {
   return (
     <header className="flex items-center gap-3 p-4">
       <img
-        src={avatar}
+        // src={avatar}
         alt="UserProfile"
         className="w-10 h-10 rounded-full object-cover"
       />
-      <p className="font-semibold text-sm">{username}</p>
+      <p className="font-semibold text-sm">
+        {username} {lastname}
+      </p>
     </header>
   );
 }

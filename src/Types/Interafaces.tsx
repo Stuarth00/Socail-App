@@ -1,6 +1,7 @@
 export interface State {
   users: User[];
   currentUser: User | null;
+  posts: Post[];
 }
 
 export interface User {
@@ -17,11 +18,17 @@ export interface User {
 export interface Post {
   id: number;
   authorId: string;
-  content: {
-    type: string;
-    url: string;
-  };
+  contentUrl: string;
   description: string;
   likes: string[];
-  comments: string[];
+  createdAt: string;
+  comments: Comment[];
+}
+
+export interface Comment {
+  id: number;
+  postId: number;
+  authorId: string;
+  text: string;
+  createdAt: string;
 }

@@ -1,11 +1,14 @@
 import Layout from "../Component/Layout";
+import PostProfile from "../Component/Post/PostProfile";
 import ProfilePage from "../Component/ProfilePage/profilePage";
 
 function UserProfile() {
   return (
     <div>
       <Layout>
-        <ProfilePage children={undefined} />
+        <ProfilePage>
+          <PostProfile />
+        </ProfilePage>
       </Layout>
     </div>
   );

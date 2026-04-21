@@ -27,7 +27,7 @@ function Signup() {
     useContext(AppContext);
   const navigate = useNavigate();
 
-  const hanldeChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -75,7 +75,7 @@ function Signup() {
           id="firstname"
           name="first_name"
           value={formData.first_name}
-          onChange={hanldeChange}
+          onChange={handleChange}
           required
           className="bg-lime-950 p-2 rounded-md"
         />
@@ -86,7 +86,7 @@ function Signup() {
           id="lastname"
           name="last_name"
           value={formData.last_name}
-          onChange={hanldeChange}
+          onChange={handleChange}
           required
           className="bg-lime-950 p-2 rounded-md"
         />
@@ -97,7 +97,7 @@ function Signup() {
           id="email"
           name="email"
           value={formData.email}
-          onChange={hanldeChange}
+          onChange={handleChange}
           required
           className="bg-lime-950 p-2 rounded-md"
         />
@@ -108,7 +108,7 @@ function Signup() {
           id="password"
           name="password"
           value={formData.password}
-          onChange={hanldeChange}
+          onChange={handleChange}
           required
           className="bg-lime-950 p-2 rounded-md"
         />
@@ -119,7 +119,7 @@ function Signup() {
           id="birth"
           name="DateOfBirth"
           value={formData.DateOfBirth}
-          onChange={hanldeChange}
+          onChange={handleChange}
           required
           className="bg-lime-950 p-2 rounded-md"
         />
