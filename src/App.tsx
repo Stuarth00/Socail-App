@@ -6,6 +6,7 @@ import UserProfile from "./Pages/UserProfile";
 import "./App.css";
 import { AppProvider } from "./Context/GlobalState";
 import Search from "./Pages/Search";
+import EditProfile from "./Component/ProfilePage/EditProfile";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/auth" element={<AuthorizationPage />} />
           <Route path="/search" element={<Search />} />
           <Route path="/user-profile" element={<UserProfile />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
         </Routes>
       </div>
     </AppProvider>

@@ -1,6 +1,6 @@
 export interface State {
-  users: User[];
-  currentUser: User | null;
+  users: UserProfile[];
+  currentUser: UserProfile | null;
   posts: Post[];
 }
 
@@ -13,6 +13,14 @@ export interface User {
   // genre: string;
   DateOfBirth: string;
   password: string;
+}
+
+export interface UserProfile extends User {
+  aboutMe?: string;
+  location?: string;
+  interests?: string[];
+  avatar?: string;
+  genre?: string;
 }
 
 export interface Post {

@@ -5,11 +5,16 @@ import { AppContext } from "../../Context/GlobalState";
 import Authorization from "../Authorization/Authorization";
 import Modal from "../Authorization/Modal";
 import CreationPost from "./creationPost";
-import EditProfile from "./EditProfile";
+// import EditProfile from "./EditProfile";
 
 function ProfilePage({ children }: { children: ReactNode }) {
-  const { state, dispatch, asyncSimulate, LoadingSpinner } =
-    useContext(AppContext);
+  const {
+    state,
+    dispatch,
+    asyncSimulate,
+    LoadingSpinner,
+    handleEditProfileClick,
+  } = useContext(AppContext);
   // const navigate = useNavigate();
 
   const [actionUser, setActionUser] = useState<"post" | "edit" | null>(null);
@@ -38,7 +43,7 @@ function ProfilePage({ children }: { children: ReactNode }) {
             <div className="flex-shrink-0">
               <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-gray-200 sm:h-32 sm:w-32">
                 <img
-                  src="#"
+                  src={state.currentUser.avatar || "/default-avatar.png"}
                   alt="Profile"
                   className="h-full w-full object-cover"
                 />
@@ -51,8 +56,11 @@ function ProfilePage({ children }: { children: ReactNode }) {
                   {state.currentUser.first_name} {state.currentUser.last_name}'s
                   Profile
                 </h1>
+                <p className="text-gray-400">{state.currentUser.email}</p>
+                <p className="text-gray-400">{state.currentUser.location}</p>
+                <p className="text-gray-400">{state.currentUser.interests}</p>
                 <p className="text-gray-400">
-                  Email: {state.currentUser.email}
+                  About Me: {state.currentUser.aboutMe}
                 </p>
                 <div className="mt-4 flex gap-6 text-sm">
                   <span>
@@ -73,7 +81,7 @@ function ProfilePage({ children }: { children: ReactNode }) {
                   Create a post
                 </button>
                 <button
-                  onClick={() => setActionUser("edit")}
+                  onClick={() => handleEditProfileClick()}
                   className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
                 >
                   Edit profile
@@ -83,7 +91,7 @@ function ProfilePage({ children }: { children: ReactNode }) {
           </header>
           <LoadingSpinner />
 
-          <main className="grid grid-cols-3 gap-1 md:gap-4">{children}</main>
+          <main className="w-full">{children}</main>
           {/* Add more profile details here */}
         </div>
       ) : (
@@ -91,7 +99,7 @@ function ProfilePage({ children }: { children: ReactNode }) {
       )}
       {actionUser && (
         <Modal onClose={() => setActionUser(null)}>
-          {actionUser === "post" ? <CreationPost /> : <EditProfile />}
+          {actionUser === "post" ? <CreationPost /> : null}
         </Modal>
       )}
     </div>

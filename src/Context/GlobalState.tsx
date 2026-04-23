@@ -2,7 +2,12 @@
 import { useNavigate } from "react-router-dom";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useEffect, useReducer, useState } from "react";
-import { type User, type State, type Post } from "../Types/Interafaces";
+import {
+  type User,
+  type State,
+  type Post,
+  type UserProfile,
+} from "../Types/Interafaces";
 import { ClipLoader } from "react-spinners";
 // import { set } from "date-fns";
 
@@ -11,6 +16,7 @@ interface AppProviderType {
   handleUserProfileClick: () => void;
   handleSearchClick: () => void;
   handleAuthClick: () => void;
+  handleEditProfileClick: () => void;
   state: State;
   dispatch: React.Dispatch<Action>;
   loading: boolean;
@@ -30,9 +36,9 @@ type Action =
   | { type: "LOGIN_USER"; payload: User }
   | { type: "LOGOUT" }
   | { type: "CREATE_POST"; payload: Post }
-  | { type: "UPDATE_PROFILE"; payload: User };
+  | { type: "UPDATE_PROFILE"; payload: UserProfile };
 
-function authReducer(state: State, action: Action): State {
+function appReducer(state: State, action: Action): State {
   switch (action.type) {
     case "REGISTER_USER":
       console.log("Reducer called with action:", action);
@@ -81,10 +87,20 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     const persisted = localStorage.getItem(KEY);
     return persisted ? JSON.parse(persisted) : initialValue;
   };
-  const [state, dispatch] = useReducer(authReducer, initialState, init);
+  const [state, dispatch] = useReducer(appReducer, initialState, init);
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(state));
+    const stateToPersist = {
+      ...state,
+      users: state.users.map((user) => ({
+        ...user,
+        avatar: "",
+      })),
+    };
+    const timeout = setTimeout(() => {
+      localStorage.setItem(KEY, JSON.stringify(stateToPersist));
+    }, 300);
+    return () => clearTimeout(timeout);
   }, [state]);
 
   //Spinner
@@ -119,6 +135,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const handleAuthClick = () => {
     navigate("/auth");
   };
+  const handleEditProfileClick = () => {
+    navigate("/edit-profile");
+  };
 
   return (
     <AppContext.Provider
@@ -129,6 +148,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         handleUserProfileClick,
         handleSearchClick,
         handleAuthClick,
+        handleEditProfileClick,
         LoadingSpinner,
         loading,
         setLoading,
