@@ -1,5 +1,5 @@
 import { useContext, useState, type ReactNode } from "react";
-// import { useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { differenceInYears } from "date-fns";
 import { AppContext } from "../../Context/GlobalState";
 import Authorization from "../Authorization/Authorization";
@@ -18,6 +18,16 @@ function ProfilePage({ children }: { children: ReactNode }) {
   // const navigate = useNavigate();
 
   const [actionUser, setActionUser] = useState<"post" | "edit" | null>(null);
+  const { userId } = useParams();
+
+  const targetUser = userId
+    ? state.users.find((u) => u.id === userId)
+    : state.currentUser;
+
+  const isOwnProfile = state.currentUser?.id === targetUser?.id;
+  const isFollowing = state.currentUser?.following?.includes(
+    targetUser?.id || "",
+  );
 
   const handleLogOut = () => {
     asyncSimulate(() => {
@@ -43,7 +53,7 @@ function ProfilePage({ children }: { children: ReactNode }) {
             <div className="flex-shrink-0">
               <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-gray-200 sm:h-32 sm:w-32">
                 <img
-                  src={state.currentUser.avatar || "/default-avatar.png"}
+                  src={targetUser?.avatar || "/default-avatar.png"}
                   alt="Profile"
                   className="h-full w-full object-cover"
                 />
@@ -53,39 +63,54 @@ function ProfilePage({ children }: { children: ReactNode }) {
             <div className="flex flex-grow flex-col items-center text-center sm:items-start sm:text-left">
               <div className="flex flex-col gap-1">
                 <h1 className="text-2xl font-semibold text-gray-300 sm:text-3xl">
-                  {state.currentUser.first_name} {state.currentUser.last_name}'s
-                  Profile
+                  {targetUser?.first_name} {targetUser?.last_name}'s Profile
                 </h1>
-                <p className="text-gray-400">{state.currentUser.email}</p>
-                <p className="text-gray-400">{state.currentUser.location}</p>
-                <p className="text-gray-400">{state.currentUser.interests}</p>
-                <p className="text-gray-400">
-                  About Me: {state.currentUser.aboutMe}
-                </p>
+                <span>Followers: {targetUser?.followers?.length || 0}</span>
+                <span>Following: {targetUser?.following?.length || 0}</span>
+                <p className="text-gray-400">{targetUser?.email}</p>
+                <p className="text-gray-400">{targetUser?.location}</p>
+                <p className="text-gray-400">{targetUser?.interests}</p>
+                <p className="text-gray-400">About Me: {targetUser?.aboutMe}</p>
                 <div className="mt-4 flex gap-6 text-sm">
                   <span>
                     <strong>Age: </strong>{" "}
                     {differenceInYears(
                       new Date(),
-                      new Date(state.currentUser.DateOfBirth),
+                      new Date(state.currentUser.date_of_birth),
                     )}
                   </span>
                 </div>
               </div>
               {/* Action buttons */}
               <div className="flex flex-row gap-8 mt-6">
-                <button
-                  onClick={() => setActionUser("post")}
-                  className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
-                >
-                  Create a post
-                </button>
-                <button
-                  onClick={() => handleEditProfileClick()}
-                  className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
-                >
-                  Edit profile
-                </button>
+                {isOwnProfile && (
+                  <>
+                    <button
+                      onClick={() => setActionUser("post")}
+                      className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
+                    >
+                      Create a post
+                    </button>
+                    <button
+                      onClick={() => handleEditProfileClick()}
+                      className="w-full rounded-md bg-gray-600 px-4 py-2 text-white hover:bg-gray-700"
+                    >
+                      Edit profile
+                    </button>
+                  </>
+                )}
+                {!isOwnProfile && (
+                  <button
+                    onClick={() =>
+                      dispatch({
+                        type: "TOGGLE_FOLLOW",
+                        payload: { targetUserId: targetUser?.id || "" },
+                      })
+                    }
+                  >
+                    {isFollowing ? "Unfollow" : "Follow"}
+                  </button>
+                )}
               </div>
             </div>
           </header>

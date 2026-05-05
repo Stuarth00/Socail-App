@@ -3,7 +3,7 @@ import { useContext } from "react";
 import { AppContext } from "../Context/GlobalState";
 
 function Search() {
-  const { state } = useContext(AppContext);
+  const { state, handleNavigateToUserId } = useContext(AppContext);
   console.log(state.users);
   console.log("current user in search page", state.currentUser);
   return (
@@ -11,13 +11,21 @@ function Search() {
       <Layout>
         <h1>Search Page</h1>
         <h3>People you may know</h3>
-        <ul>
+        <div>
           {state.users.map((user) => (
-            <li key={user.id}>
+            <span
+              key={user.id}
+              onClick={() => handleNavigateToUserId(user.id)}
+              style={{
+                cursor: "pointer",
+                display: "block",
+                marginBottom: "5px",
+              }}
+            >
               {user.first_name} {user.last_name}
-            </li>
+            </span>
           ))}
-        </ul>
+        </div>
         <ul>
           {state.currentUser ? (
             <li>

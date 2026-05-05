@@ -4,7 +4,7 @@ import type { Post } from "../../Types/Interafaces";
 import heic2any from "heic2any";
 
 function CreationPost() {
-  const { state, dispatch, asyncSimulate } = useContext(AppContext);
+  const { dispatch, createPost } = useContext(AppContext);
 
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [description, setDescription] = useState("");
@@ -53,66 +53,86 @@ function CreationPost() {
     }
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Submitting post with image URL:", imageUrl);
 
     const newPost: Post = {
-      id: Date.now(),
-      authorId: state.currentUser?.id || "unknown",
-      contentUrl: imageUrl || "",
+      content_url: imageUrl || "",
       description: description,
-      likes: [],
-      createdAt: new Date().toISOString(),
-      comments: [],
     };
 
-    asyncSimulate(() => {
+    try {
+      const createdPost = await createPost(newPost);
       dispatch({
         type: "CREATE_POST",
-        payload: newPost,
+        payload: createdPost,
       });
-      setImageUrl(null);
-    });
+    } catch (error) {
+      console.error("Failed to create post:", error);
+      alert("Could not create post. Please try again.");
+      return;
+    }
+    setImageUrl(null);
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Create a Post</h2>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="content">Content:</label>
+    <div className="w-full max-w-2xl mx-auto p-4 sm:p-6">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
+        Create a Post
+      </h2>
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 bg-white dark:bg-gray-900 shadow-md rounded-xl p-4 sm:p-6"
+      >
+        {/* Image Upload */}
         <label
           htmlFor="file-input"
-          className="cursor-pointer  text-white px-4 py-2 rounded-lg hover:bg-gray-500 transition block font-medium required"
+          className="cursor-pointer flex items-center justify-center border-2 border-dashed border-gray-400 rounded-lg p-6 text-center hover:bg-gray-100 dark:hover:bg-gray-800 transition"
         >
-          Select your image!
+          <span className="text-gray-600 dark:text-gray-300">
+            Click to upload an image
+          </span>
         </label>
+
         <input
           id="file-input"
           type="file"
           onChange={handleFileChange}
-          required
+          // required
           className="hidden"
           accept={acceptedFormats}
         />
 
-        <label htmlFor="description">Description:</label>
+        {/* Preview */}
+        {imageUrl && (
+          <div className="w-full flex justify-center">
+            <img
+              src={imageUrl}
+              alt="Preview"
+              className="rounded-lg max-h-80 object-contain"
+            />
+          </div>
+        )}
 
+        {/* Description */}
         <textarea
           id="description"
+          value={description}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Describe your post..."
-          className="border p-2 rounded m-2"
+          className="w-full border rounded-lg p-3 resize-none focus:ring-2 focus:ring-blue-500 outline-none min-h-[100px]"
         />
 
-        <button type="submit">Create Post</button>
+        {/* Submit */}
+        <button
+          type="submit"
+          className="w-full sm:w-auto self-end bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-500 text-white px-6 py-2 rounded-lg transition"
+        >
+          Create Post
+        </button>
       </form>
-      {imageUrl && (
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">Preview:</h3>
-          <img src={imageUrl} alt="Preview" className="max-w-full h-auto" />
-        </div>
-      )}
     </div>
   );
 }

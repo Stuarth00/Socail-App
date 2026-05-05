@@ -1,6 +1,7 @@
 import { useContext, useState, type ChangeEvent, type FormEvent } from "react";
 import { AppContext } from "../../Context/GlobalState";
 import { useNavigate } from "react-router-dom";
+import type { User } from "../../Types/Interafaces";
 
 interface SignupFormData {
   first_name: string;
@@ -8,7 +9,7 @@ interface SignupFormData {
   email: string;
   // avatar?: string;
   // genre: string;
-  DateOfBirth: string;
+  date_of_birth: string;
   password: string;
 }
 
@@ -16,14 +17,14 @@ const initial_form: SignupFormData = {
   first_name: "",
   last_name: "",
   email: "",
-  DateOfBirth: "",
+  date_of_birth: "",
   password: "",
 };
 
 function Signup() {
   const [formData, setFormData] = useState<SignupFormData>(initial_form);
 
-  const { state, dispatch, asyncSimulate, LoadingSpinner } =
+  const { state, dispatch, LoadingSpinner, registerUser } =
     useContext(AppContext);
   const navigate = useNavigate();
 
@@ -35,29 +36,21 @@ function Signup() {
     }));
   };
 
-  const hanldeSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const hanldeSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const emailExists = state.users.some(
       (user) => user.email === formData.email,
     );
     if (emailExists) {
-      alert("Email already exists. Please use a different email.");
+      console.error("Email already exists. Please use a different email.");
       return;
     }
-    asyncSimulate(() => {
-      dispatch({
-        type: "REGISTER_USER",
-        payload: {
-          ...formData,
-          id: crypto.randomUUID(),
-        },
-      });
-      setFormData(initial_form);
-      navigate("/");
-    });
+    await registerUser(formData as User);
+    dispatch({ type: "REGISTER_USER", payload: formData as User });
+    navigate("/user-profile");
   };
-
+  console.log("Signup component rendered with formData:", formData);
   return (
     <div>
       <h1>Sign up</h1>
@@ -117,8 +110,8 @@ function Signup() {
         <input
           type="date"
           id="birth"
-          name="DateOfBirth"
-          value={formData.DateOfBirth}
+          name="date_of_birth"
+          value={formData.date_of_birth}
           onChange={handleChange}
           required
           className="bg-lime-950 p-2 rounded-md"

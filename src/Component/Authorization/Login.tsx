@@ -1,5 +1,6 @@
 import { useState, useContext, type ChangeEvent, type FormEvent } from "react";
 import { AppContext } from "../../Context/GlobalState";
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormData {
   email: string;
@@ -13,8 +14,9 @@ const initial_form: LoginFormData = {
 
 function Login() {
   const [formData, setFormData] = useState<LoginFormData>(initial_form);
-  const { state, dispatch, LoadingSpinner, asyncSimulate } =
+  const { dispatch, LoadingSpinner, loginUser, getCurrentAccount } =
     useContext(AppContext);
+  const navigate = useNavigate();
 
   const hanldeChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,24 +26,27 @@ function Login() {
     }));
   };
 
-  const hanldeSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const hanldeSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const validAccess = state.users.find(
-      (user) =>
-        user.email === formData.email && user.password === formData.password,
-    );
-    if (validAccess) {
-      asyncSimulate(() => {
-        dispatch({
-          type: "LOGIN_USER",
-          payload: validAccess,
-        });
-      });
-    } else {
-      alert("Invalid email or password. Please try again.");
-    }
-
+    // const validAccess = state.users.find(
+    //   (user) =>
+    //     user.email === formData.email && user.password === formData.password,
+    // );
+    // if (validAccess) {
+    //   asyncSimulate(() => {
+    //     dispatch({
+    //       type: "LOGIN_USER",
+    //       payload: validAccess,
+    //     });
+    //   });
+    // } else {
+    //   alert("Invalid email or password. Please try again.");
+    // }
+    await loginUser(formData.email, formData.password);
+    const user = await getCurrentAccount();
+    dispatch({ type: "SET_CURRENT_USER", payload: user });
+    navigate("/user-profile");
     setFormData(initial_form);
   };
   return (

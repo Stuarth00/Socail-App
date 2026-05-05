@@ -4,33 +4,34 @@ export interface State {
   posts: Post[];
 }
 
+export type NewUser = Omit<User, "id">;
+
+export interface Token {
+  token: string;
+}
+
 export interface User {
   id: string;
   first_name: string;
   last_name: string;
   email: string;
-  // avatar?: string;
-  // genre: string;
-  DateOfBirth: string;
+  date_of_birth: string;
   password: string;
 }
 
 export interface UserProfile extends User {
-  aboutMe?: string;
+  about_me?: string;
   location?: string;
   interests?: string[];
   avatar?: string;
-  genre?: string;
+  gender?: string;
+  followers?: string[];
+  following?: string[];
 }
 
 export interface Post {
-  id: number;
-  authorId: string;
-  contentUrl: string;
-  description: string;
-  likes: string[];
-  createdAt: string;
-  comments: Comment[];
+  content_url?: string;
+  description?: string;
 }
 
 export interface Comment {

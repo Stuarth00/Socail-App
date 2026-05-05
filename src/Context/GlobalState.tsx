@@ -5,10 +5,18 @@ import React, { createContext, useEffect, useReducer, useState } from "react";
 import {
   type User,
   type State,
+  type Token,
   type Post,
   type UserProfile,
 } from "../Types/Interafaces";
 import { ClipLoader } from "react-spinners";
+import {
+  registerUser,
+  loginUser,
+  getCurrentAccount,
+  editAccount,
+  createPost,
+} from "./Requests";
 // import { set } from "date-fns";
 
 interface AppProviderType {
@@ -17,12 +25,18 @@ interface AppProviderType {
   handleSearchClick: () => void;
   handleAuthClick: () => void;
   handleEditProfileClick: () => void;
+  handleNavigateToUserId: (userId: string) => void;
   state: State;
   dispatch: React.Dispatch<Action>;
   loading: boolean;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   LoadingSpinner: () => JSX.Element | null | undefined;
   asyncSimulate: (callback: () => void, delay?: number) => void;
+  registerUser: (userData: User) => Promise<Token>;
+  loginUser: (email: string, password: string) => Promise<Token>;
+  getCurrentAccount: () => Promise<User>;
+  editAccount: (updates: Partial<UserProfile>) => Promise<UserProfile>;
+  createPost: (description: Post) => Promise<Post>;
 }
 
 const initialState: State = {
@@ -32,14 +46,21 @@ const initialState: State = {
 };
 
 type Action =
+  | { type: "SET_CURRENT_USER"; payload: User }
   | { type: "REGISTER_USER"; payload: User }
   | { type: "LOGIN_USER"; payload: User }
   | { type: "LOGOUT" }
   | { type: "CREATE_POST"; payload: Post }
-  | { type: "UPDATE_PROFILE"; payload: UserProfile };
+  | { type: "UPDATE_PROFILE"; payload: UserProfile }
+  | { type: "TOGGLE_FOLLOW"; payload: { targetUserId: string } };
 
 function appReducer(state: State, action: Action): State {
   switch (action.type) {
+    case "SET_CURRENT_USER":
+      return {
+        ...state,
+        currentUser: action.payload,
+      };
     case "REGISTER_USER":
       console.log("Reducer called with action:", action);
       console.log("Initial state:", initialState);
@@ -72,6 +93,45 @@ function appReducer(state: State, action: Action): State {
           user.id === action.payload.id ? action.payload : user,
         ),
       };
+    case "TOGGLE_FOLLOW": {
+      if (!state.currentUser) return state;
+
+      const currentUser = state.currentUser;
+      const targetId = action.payload.targetUserId;
+      const isFollowing = currentUser.following?.includes(targetId);
+      console.log("Reducer called with action:", action);
+      console.log(state.currentUser?.following);
+      return {
+        ...state,
+        users: state.users.map((user) => {
+          if (user.id === currentUser.id) {
+            return {
+              ...user,
+              following: isFollowing
+                ? user.following?.filter((id) => id !== targetId)
+                : [...(user.following || []), targetId],
+            };
+          }
+
+          if (user.id === targetId) {
+            return {
+              ...user,
+              followers: isFollowing
+                ? user.followers?.filter((id) => id !== currentUser.id)
+                : [...(user.followers || []), currentUser.id],
+            };
+          }
+          return user;
+        }),
+
+        currentUser: {
+          ...currentUser,
+          following: isFollowing
+            ? currentUser.following?.filter((id) => id !== targetId)
+            : [...(currentUser.following || []), targetId],
+        },
+      };
+    }
     default:
       return state;
   }
@@ -138,6 +198,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const handleEditProfileClick = () => {
     navigate("/edit-profile");
   };
+  const handleNavigateToUserId = (userId: string) => {
+    navigate(`/user/${userId}`);
+  };
 
   return (
     <AppContext.Provider
@@ -149,10 +212,16 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         handleSearchClick,
         handleAuthClick,
         handleEditProfileClick,
+        handleNavigateToUserId,
         LoadingSpinner,
         loading,
         setLoading,
         asyncSimulate,
+        registerUser,
+        loginUser,
+        getCurrentAccount,
+        editAccount,
+        createPost,
       }}
     >
       {children}

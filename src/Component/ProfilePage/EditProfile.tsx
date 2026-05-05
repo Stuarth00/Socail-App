@@ -6,22 +6,24 @@ function EditProfile() {
   const {
     state,
     dispatch,
-    asyncSimulate,
     LoadingSpinner,
     handleUserProfileClick,
+    editAccount,
   } = useContext(AppContext);
+
   const [formData, setFormData] = useState<UserProfile>(
     state.currentUser || {
       id: "",
       first_name: "",
       last_name: "",
       email: "",
-      DateOfBirth: "",
+      date_of_birth: "",
       avatar: "",
-      aboutMe: "",
+      about_me: "",
       location: "",
       interests: [],
       password: "",
+      gender: "",
     },
   );
   const handleCancelSubmission = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -43,7 +45,9 @@ function EditProfile() {
     reader.readAsDataURL(file);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
@@ -51,31 +55,35 @@ function EditProfile() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    asyncSimulate(() => {
-      dispatch({
-        type: "UPDATE_PROFILE",
-        payload: {
-          ...formData,
-          id: state.currentUser?.id || crypto.randomUUID(),
-          password: state.currentUser?.password || "",
-        },
-      });
-      handleUserProfileClick();
-      setFormData({
-        id: "",
-        first_name: "",
-        last_name: "",
-        email: "",
-        DateOfBirth: "",
-        avatar: "",
-        aboutMe: "",
-        location: "",
-        interests: [],
-        password: "",
-      });
+    console.log(formData);
+    await editAccount({
+      ...formData,
+    });
+
+    dispatch({
+      type: "UPDATE_PROFILE",
+      payload: {
+        ...formData,
+        id: state.currentUser?.id || crypto.randomUUID(),
+        password: state.currentUser?.password || "",
+      },
+    });
+    handleUserProfileClick();
+    setFormData({
+      id: "",
+      first_name: "",
+      last_name: "",
+      email: "",
+      date_of_birth: "",
+      avatar: "",
+      about_me: "",
+      location: "",
+      interests: [],
+      password: "",
+      gender: "",
     });
   };
 
@@ -127,10 +135,16 @@ function EditProfile() {
           />
           <label className="block font-medium">About Me</label>
           <input
+            id="about_me"
             type="text"
-            name="aboutMe"
-            value={formData.aboutMe}
-            onChange={handleChange}
+            name="about_me"
+            value={formData.about_me}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                about_me: e.target.value,
+              }))
+            }
             className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           />
         </div>
@@ -148,6 +162,7 @@ function EditProfile() {
 
           <label className="block font-medium">Location</label>
           <input
+            id="location"
             type="location"
             name="location"
             value={formData.location}
@@ -155,18 +170,41 @@ function EditProfile() {
             className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           />
 
+          <label className="block font-medium">Gender</label>
+          <select
+            name="gender"
+            value={formData.gender || ""}
+            onChange={handleChange}
+            className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="not_say">Prefer not to say</option>
+          </select>
+
           <label className="block font-medium">interests</label>
           <input
+            id="interests"
             type="text"
             name="interests"
-            value={formData.interests}
-            onChange={handleChange}
+            value={
+              Array.isArray(formData.interests)
+                ? formData.interests.join(", ")
+                : formData.interests || ""
+            }
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                interests: e.target.value.split(",").map((i) => i.trim()),
+              }))
+            }
             className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
           />
 
           <p className="text-sm font-medium ">Date of Birth</p>
           <p className="p-3 border rounded-lg text-gray-500">
-            {state.currentUser?.DateOfBirth}
+            {state.currentUser?.date_of_birth}
           </p>
         </div>
 
