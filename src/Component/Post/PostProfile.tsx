@@ -1,13 +1,45 @@
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../Context/GlobalState";
+import type { Post } from "../../Types/Interafaces";
 
-function PostProfile() {
-  const { state } = useContext(AppContext);
+function PostProfile({
+  user_id,
+  isOwnProfile,
+}: {
+  user_id: string;
+  isOwnProfile: boolean;
+}) {
+  const { getPost, getPostsByUserId } = useContext(AppContext);
   const [numCols, setNumCols] = useState(3);
+  const [myPosts, setMyPosts] = useState<Post[]>([]);
 
-  const userPosts = state.posts.filter(
-    (post) => post.authorId === state.currentUser?.id,
-  );
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const posts = isOwnProfile
+          ? await getPost()
+          : await getPostsByUserId(user_id);
+
+        setMyPosts(posts);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchPosts();
+  }, [user_id, isOwnProfile]);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data: Post[] = await getPost();
+  //       setMyPosts(data);
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   };
+  //   fetchData();
+  // }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,14 +54,14 @@ function PostProfile() {
     };
   }, []);
 
-  const distributePhotos = (items: typeof userPosts, numCols: number) => {
-    const cols = Array.from({ length: numCols }, () => [] as typeof userPosts);
+  const distributePhotos = (items: Post[], numCols: number): Post[][] => {
+    const cols = Array.from({ length: numCols }, () => [] as Post[]);
     items.forEach((post, i) => {
       cols[i % numCols].push(post);
     });
     return cols;
   };
-  const columns = distributePhotos(userPosts, numCols);
+  const columns = distributePhotos(myPosts, numCols);
 
   return (
     <div className="p-4">
@@ -39,16 +71,22 @@ function PostProfile() {
           <div key={colIndex} className="flex flex-col gap-4 flex-1">
             {col.map((photo) => (
               <div
-                key={photo.id}
+                key={photo.post_id}
                 className="border border-gray-300 rounded overflow-hidden shadow-lg break-inside-avoid"
               >
-                <img
-                  src={photo.contentUrl}
-                  alt={photo.description}
-                  className="w-full h-auto rounded-t hoverImg"
-                  // onClick={() => handleClick(photo)}
-                  style={{ cursor: "pointer" }}
-                />
+                {photo.content_url
+
+                  ?.filter((media) => media.content_url)
+
+                  .map((media) => (
+                    <img
+                      key={media.media_id}
+                      src={media.content_url!}
+                      alt={photo.description}
+                      className="w-full h-auto rounded-t hoverImg"
+                    />
+                  ))}
+                ;<p>{photo.description}</p>
               </div>
             ))}
           </div>
@@ -59,23 +97,3 @@ function PostProfile() {
 }
 
 export default PostProfile;
-
-{
-  /* 1. columns-2: 2 columns on small screens
-         2. md:columns-3: 3 columns on medium screens and up
-         3. gap-4: spacing between images
-      */
-}
-{
-  /* <div className="columns-2 md:columns-3 gap-4 space-y-4">
-        {userPosts.map((post) => (
-          <div key={post.id} className="break-inside-avoid">
-            <img
-              src={post.contentUrl}
-              alt={post.description}
-              className="w-full rounded-lg shadow-md hover:opacity-90 transition"
-            />
-          </div>
-        ))}
-      </div> */
-}

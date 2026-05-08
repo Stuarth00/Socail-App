@@ -11,7 +11,7 @@ export interface Token {
 }
 
 export interface User {
-  id: string;
+  user_id: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -30,14 +30,27 @@ export interface UserProfile extends User {
 }
 
 export interface Post {
-  content_url?: string;
+  post_id?: string;
+  author_id?: string;
+  author_first_name?: string;
+  author_last_name?: string;
   description?: string;
+  content_url: Media[];
+  likes?: Like[];
+  comments?: PostComment[];
+  created_at?: string;
 }
 
-export interface Comment {
-  id: number;
-  postId: number;
-  authorId: string;
-  text: string;
-  createdAt: string;
+export interface PostComment {
+  username?: string;
+  text?: string;
+}
+
+export interface Media {
+  media_id?: number;
+  content_url?: string | null;
+}
+
+export interface Like {
+  username: string;
 }

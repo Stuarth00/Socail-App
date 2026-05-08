@@ -13,10 +13,14 @@ import { ClipLoader } from "react-spinners";
 import {
   registerUser,
   loginUser,
+  getAllUsers,
   getCurrentAccount,
   editAccount,
   createPost,
   getPost,
+  getAllPosts,
+  getUserById,
+  getPostsByUserId,
 } from "./Requests";
 // import { set } from "date-fns";
 
@@ -38,7 +42,11 @@ interface AppProviderType {
   getCurrentAccount: () => Promise<User>;
   editAccount: (updates: Partial<UserProfile>) => Promise<UserProfile>;
   createPost: (description: Post) => Promise<Post>;
-  getPost: () => Promise<Post>;
+  getPost: () => Promise<Post[]>;
+  getAllPosts: () => Promise<Post[]>;
+  getAllUsers: () => Promise<User[]>;
+  getUserById: (id: string) => Promise<User>;
+  getPostsByUserId: (id: string) => Promise<Post[]>;
 }
 
 const initialState: State = {
@@ -92,7 +100,7 @@ function appReducer(state: State, action: Action): State {
         ...state,
         currentUser: action.payload,
         users: state.users.map((user) =>
-          user.id === action.payload.id ? action.payload : user,
+          user.user_id === action.payload.user_id ? action.payload : user,
         ),
       };
     case "TOGGLE_FOLLOW": {
@@ -106,7 +114,7 @@ function appReducer(state: State, action: Action): State {
       return {
         ...state,
         users: state.users.map((user) => {
-          if (user.id === currentUser.id) {
+          if (user.user_id === currentUser.user_id) {
             return {
               ...user,
               following: isFollowing
@@ -115,12 +123,12 @@ function appReducer(state: State, action: Action): State {
             };
           }
 
-          if (user.id === targetId) {
+          if (user.user_id === targetId) {
             return {
               ...user,
               followers: isFollowing
-                ? user.followers?.filter((id) => id !== currentUser.id)
-                : [...(user.followers || []), currentUser.id],
+                ? user.followers?.filter((id) => id !== currentUser.user_id)
+                : [...(user.followers || []), currentUser.user_id],
             };
           }
           return user;
@@ -200,8 +208,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const handleEditProfileClick = () => {
     navigate("/edit-profile");
   };
-  const handleNavigateToUserId = (userId: string) => {
-    navigate(`/user/${userId}`);
+  const handleNavigateToUserId = (user_id: string) => {
+    navigate(`/user/${user_id}`);
   };
 
   return (
@@ -225,6 +233,10 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         editAccount,
         createPost,
         getPost,
+        getAllPosts,
+        getAllUsers,
+        getUserById,
+        getPostsByUserId,
       }}
     >
       {children}

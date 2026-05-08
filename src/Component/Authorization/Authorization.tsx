@@ -18,7 +18,7 @@ function Authorization() {
       <div className="flex flex-col items-start justify-start pt-8 px-8 md:justify-center md:pt-0 md:px-16 lg:px-24">
         <div className="mb-6">
           <h1 className="text-4xl font-bold tracking-tight text-gray-600 md:text-5xl">
-            Conecta con todos
+            Connect with everyone
           </h1>
           <p className="mt-2 text-gray-600">Join our comminity right away!</p>
         </div>

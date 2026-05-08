@@ -13,7 +13,8 @@ function PostHeader({
         className="w-10 h-10 rounded-full object-cover"
       />
       <p className="font-semibold text-sm">
-        {username} {lastname}
+        {username}
+        {lastname}
       </p>
     </header>
   );

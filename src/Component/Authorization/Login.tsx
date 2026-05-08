@@ -29,20 +29,6 @@ function Login() {
   const hanldeSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // const validAccess = state.users.find(
-    //   (user) =>
-    //     user.email === formData.email && user.password === formData.password,
-    // );
-    // if (validAccess) {
-    //   asyncSimulate(() => {
-    //     dispatch({
-    //       type: "LOGIN_USER",
-    //       payload: validAccess,
-    //     });
-    //   });
-    // } else {
-    //   alert("Invalid email or password. Please try again.");
-    // }
     await loginUser(formData.email, formData.password);
     const user = await getCurrentAccount();
     dispatch({ type: "SET_CURRENT_USER", payload: user });

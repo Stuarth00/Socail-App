@@ -1,21 +1,34 @@
 import Layout from "../Component/Layout";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Context/GlobalState";
+import { type User } from "../Types/Interafaces";
 
 function Search() {
-  const { state, handleNavigateToUserId } = useContext(AppContext);
-  console.log(state.users);
-  console.log("current user in search page", state.currentUser);
+  const { state, handleNavigateToUserId, getAllUsers } = useContext(AppContext);
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data: User[] = await getAllUsers();
+        setUsers(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div>
       <Layout>
         <h1>Search Page</h1>
         <h3>People you may know</h3>
         <div>
-          {state.users.map((user) => (
+          {users.map((user) => (
             <span
-              key={user.id}
-              onClick={() => handleNavigateToUserId(user.id)}
+              key={user.user_id}
+              onClick={() => handleNavigateToUserId(user.user_id)}
               style={{
                 cursor: "pointer",
                 display: "block",

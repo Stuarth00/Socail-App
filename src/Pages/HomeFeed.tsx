@@ -1,18 +1,31 @@
 import Layout from "../Component/Layout";
-import Post from "../Component/Post/Post";
-// import mockPost from "../Types/mockPosts";
-import { useContext } from "react";
+import PostFeed from "../Component/Post/PostFeed";
+import type { Post } from "../Types/Interafaces";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Context/GlobalState";
 
 function HomeFeed() {
-  const { state } = useContext(AppContext);
+  const { getAllPosts } = useContext(AppContext);
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data: Post[] = await getAllPosts();
+        setPosts(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchData();
+  }, []);
 
   return (
     <div className="mt-4">
       <Layout>
         <h1>Home Feed</h1>
-        {state.posts.map((post) => (
-          <Post key={post.id} post={post} />
+        {posts.map((post) => (
+          <PostFeed key={post.post_id} post={post} />
         ))}
       </Layout>
     </div>

@@ -58,7 +58,7 @@ function CreationPost() {
     console.log("Submitting post with image URL:", imageUrl);
 
     const newPost: Post = {
-      content_url: imageUrl || "",
+      content_url: [{ content_url: imageUrl }],
       description: description,
     };
 

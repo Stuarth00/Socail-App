@@ -1,13 +1,13 @@
 function PostContent({
-  contentUrl,
+  content_url,
   description,
 }: {
-  contentUrl: string;
-  description: string;
+  content_url: string;
+  description: string | undefined;
 }) {
   return (
     <div>
-      <img src={contentUrl} alt="Content-image" />
+      {content_url?.[0] && <img src={content_url[0]} alt={description} />}
       <p>{description}</p>
     </div>
   );

@@ -10,7 +10,7 @@ export const registerUser = async (formData: NewUser) => {
   });
   if (response.status !== 200) throw new Error('Signup failed');
   const token: Token = await response.json();
-  localStorage.setItem('token', 'token');
+  localStorage.setItem('token', token.token);
   return token; // returns the created user
 }
 
@@ -22,19 +22,19 @@ export const loginUser = async (email: string, password: string) => {
         body: JSON.stringify({ email, password })
     })
     if (response.status !== 200) throw new Error('Login failed');
-    const { token } = await response.json();
-    localStorage.setItem('token', token);
+    const token : Token  = await response.json();
+    localStorage.setItem('token', token.token);
     return token; 
 }
 
 // Getting current account 
 export const getCurrentAccount = async () => {
-    const token = localStorage.getItem('token');
+    const token  = localStorage.getItem('token');
     console.log(token)
     const response = await fetch('http://localhost:3001/api/users/me', {
         method: 'GET', 
         headers: { 'Authorization': `Bearer ${token}`}, 
-    })
+    });
     if(response.status !== 200) throw new Error('Invalid token');
     return response.json();
 }
@@ -78,3 +78,43 @@ export const getPost = async () => {
   if(!response.ok) throw new Error('Getting posts failed');
   return response.json();
 }
+
+export const getAllPosts = async () => { 
+  const response = await fetch('http://localhost:3001/api/posts/all-posts',{ 
+    method: 'GET', 
+    headers: { 
+      'Content-Type': 'application/json'
+    }, 
+  });
+  if(!response.ok) throw new Error('Getting posts failed');
+  return response.json();
+}
+
+export const getAllUsers = async () => {
+  const response = await fetch('http://localhost:3001/api/users/get-all-users', {
+    method: 'GET', 
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  });
+  if(!response.ok) throw new Error('Getting users failed');
+  return response.json();
+}
+
+export const getUserById = async (id : string) => {
+  const response = await fetch(`http://localhost:3001/api/public/users/${id}`, {
+    method: 'GET', 
+  });
+  if(!response.ok) throw new Error('Getting user by id failed');
+  return response.json(); 
+}
+
+export const getPostsByUserId = async (user_id: string) => {
+  const response = await fetch(
+    `http://localhost:3001/api/public/posts/${user_id}`
+  );
+  if (!response.ok) {
+    throw new Error("Failed to fetch user posts");
+  }
+  return response.json();
+};
