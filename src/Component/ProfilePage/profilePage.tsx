@@ -1,16 +1,9 @@
 import { useContext, useState, type ReactNode } from "react";
-// import { useParams } from "react-router-dom";
 import { differenceInYears } from "date-fns";
 import { AppContext } from "../../Context/GlobalState";
-// import Authorization from "../Authorization/Authorization";
 import Modal from "../Authorization/Modal";
 import CreationPost from "./creationPost";
 import type { UserProfile } from "../../Types/Interafaces";
-// import type { UserProfile } from "../../Types/Interafaces";
-// import { getUserById } from "../../Context/Requests";
-// import Authorization from "../Authorization/Authorization";
-// import UserProfile from "../../Pages/UserProfile";
-// import EditProfile from "./EditProfile";
 
 function ProfilePage({
   children,
@@ -27,31 +20,10 @@ function ProfilePage({
     asyncSimulate,
     LoadingSpinner,
     handleEditProfileClick,
+    toggleFollowing,
   } = useContext(AppContext);
 
-  // const { profileUser, isOwnProfile } = props;
-
   const [actionUser, setActionUser] = useState<"post" | "edit" | null>(null);
-  // const { user_id } = useParams<{ user_id: string }>();
-  // const [profileUser, setProfileUser] = useState<UserProfile | null>(null);
-
-  // useEffect(() => {
-  //   if (user_id) {
-  //     const fetchProfile = async () => {
-  //       const data = await getUserById(user_id);
-  //       setProfileUser(data);
-  //     };
-  //     fetchProfile();
-  //   } else {
-  //     // eslint-disable-next-line react-hooks/set-state-in-effect
-  //     setProfileUser(state.currentUser);
-  //   }
-  // }, [user_id]);
-
-  // if (!user_id && !state.currentUser) {
-  //   return <Authorization />;
-  // }
-  // const isOwnProfile = !user_id || state.currentUser?.user_id === user_id;
 
   const isFollowing =
     !!profileUser &&
@@ -63,6 +35,18 @@ function ProfilePage({
         type: "LOGOUT",
       });
     });
+  };
+
+  const handleFollow = async () => {
+    const targetId = profileUser?.user_id;
+    console.log("targetId:", targetId);
+    if (targetId) {
+      await toggleFollowing(targetId);
+      dispatch({
+        type: "TOGGLE_FOLLOW",
+        payload: { targetUserId: targetId },
+      });
+    }
   };
 
   return (
@@ -129,14 +113,7 @@ function ProfilePage({
                 </>
               )}
               {!isOwnProfile && (
-                <button
-                  onClick={() =>
-                    dispatch({
-                      type: "TOGGLE_FOLLOW",
-                      payload: { targetUserId: profileUser?.user_id || "" },
-                    })
-                  }
-                >
+                <button onClick={() => handleFollow()}>
                   {isFollowing ? "Unfollow" : "Follow"}
                 </button>
               )}

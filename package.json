@@ -14,6 +14,7 @@
     "date-fns": "^4.1.0",
     "google-places-autocomplete-react": "^1.0.18",
     "heic2any": "^0.0.4",
+    "jwt-decode": "^4.0.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.1",

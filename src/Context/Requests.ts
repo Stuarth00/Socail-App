@@ -1,5 +1,14 @@
 import type { Post, NewUser, Token, UserProfile } from "../Types/Interafaces";
 
+const handleResponse = async (response: Response) => {
+if(response.status === 401) {
+   localStorage.removeItem("token");
+   throw new Error("UNAUTHORIZED");
+}
+  if(!response.ok) throw new Error('Request failed');
+  return response.json();
+}
+
 
 // Sign up function to register a new user
 export const registerUser = async (formData: NewUser) => {
@@ -35,8 +44,8 @@ export const getCurrentAccount = async () => {
         method: 'GET', 
         headers: { 'Authorization': `Bearer ${token}`}, 
     });
-    if(response.status !== 200) throw new Error('Invalid token');
-    return response.json();
+    // if(response.status !== 200) throw new Error('Invalid token');
+    return handleResponse(response);
 }
 
 export const editAccount = async (updates : Partial<UserProfile>) => {
@@ -49,8 +58,8 @@ export const editAccount = async (updates : Partial<UserProfile>) => {
     },
     body: JSON.stringify(updates)
   });
-  if(!response.ok) throw new Error('Edit failed');
-  return response.json(); 
+  // if(!response.ok) throw new Error('Edit failed');
+  return handleResponse(response); 
 }
 
 //Creating Posts
@@ -64,8 +73,8 @@ export const createPost = async (description : Post) => {
         }, 
         body: JSON.stringify(description)
     });
-    if(!response.ok) throw new Error('Post creation failed');
-    return response.json();
+    // if(!response.ok) throw new Error('Post creation failed');
+    return handleResponse(response);
 }
 
 //Getting posts by user logged in
@@ -75,8 +84,8 @@ export const getPost = async () => {
     method: 'GET', 
     headers: { 'Authorization': `Bearer ${token}`}, 
   });
-  if(!response.ok) throw new Error('Getting posts failed');
-  return response.json();
+  // if(!response.ok) throw new Error('Getting posts failed');
+  return handleResponse(response);
 }
 
 export const getAllPosts = async () => { 
@@ -86,8 +95,8 @@ export const getAllPosts = async () => {
       'Content-Type': 'application/json'
     }, 
   });
-  if(!response.ok) throw new Error('Getting posts failed');
-  return response.json();
+  // if(!response.ok) throw new Error('Getting posts failed');
+  return handleResponse(response);
 }
 
 export const getAllUsers = async () => {
@@ -97,16 +106,16 @@ export const getAllUsers = async () => {
       'Content-Type': 'application/json'
     },
   });
-  if(!response.ok) throw new Error('Getting users failed');
-  return response.json();
+  // if(!response.ok) throw new Error('Getting users failed');
+  return handleResponse(response); 
 }
 
 export const getUserById = async (id : string) => {
   const response = await fetch(`http://localhost:3001/api/public/users/${id}`, {
     method: 'GET', 
   });
-  if(!response.ok) throw new Error('Getting user by id failed');
-  return response.json(); 
+  // if(!response.ok) throw new Error('Getting user by id failed');
+  return handleResponse(response); 
 }
 
 export const getPostsByUserId = async (user_id: string) => {
@@ -117,4 +126,18 @@ export const getPostsByUserId = async (user_id: string) => {
     throw new Error("Failed to fetch user posts");
   }
   return response.json();
-};
+}
+
+//Following system
+export const toggleFollowing = async (id: string) => { 
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:3001/api/following/${id}/toggle-follow`, {
+        method: 'POST', 
+        headers: {
+            'Content-Type': 'application/json', 
+            'Authorization': `Bearer ${token}`
+        }, 
+    });
+    // if(!response.ok) throw new Error('Toggling follow failed');
+    return handleResponse(response); 
+}

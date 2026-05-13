@@ -1,4 +1,3 @@
-// import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { JSX, ReactNode } from "react";
 import React, { createContext, useEffect, useReducer, useState } from "react";
@@ -21,8 +20,8 @@ import {
   getAllPosts,
   getUserById,
   getPostsByUserId,
+  toggleFollowing,
 } from "./Requests";
-// import { set } from "date-fns";
 
 interface AppProviderType {
   handleHomeClick: () => void;
@@ -47,6 +46,7 @@ interface AppProviderType {
   getAllUsers: () => Promise<User[]>;
   getUserById: (id: string) => Promise<User>;
   getPostsByUserId: (id: string) => Promise<Post[]>;
+  toggleFollowing: (id: string) => Promise<void>;
 }
 
 const initialState: State = {
@@ -158,7 +158,35 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return persisted ? JSON.parse(persisted) : initialValue;
   };
   const [state, dispatch] = useReducer(appReducer, initialState, init);
+  //Routes
+  const navigate = useNavigate();
 
+  //Check token validation
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        dispatch({ type: "LOGOUT" });
+        navigate("/auth");
+        return;
+      }
+      try {
+        const user = await getCurrentAccount();
+        dispatch({
+          type: "SET_CURRENT_USER",
+          payload: user,
+        });
+      } catch (error) {
+        localStorage.removeItem("token");
+        dispatch({ type: "LOGOUT" });
+        navigate("/auth");
+        console.log(error);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  //Storing in localStorage
   useEffect(() => {
     const stateToPersist = {
       ...state,
@@ -188,10 +216,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false);
     }, delay);
   };
-
-  //Routes
-  const navigate = useNavigate();
-  //   const location = useLocation();
 
   const handleHomeClick = () => {
     navigate("/");
@@ -237,6 +261,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         getAllUsers,
         getUserById,
         getPostsByUserId,
+        toggleFollowing,
       }}
     >
       {children}

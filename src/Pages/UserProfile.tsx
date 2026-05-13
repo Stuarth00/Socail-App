@@ -28,7 +28,6 @@ function UserProfile() {
   if (!user_id && !state.currentUser) return <Authorization />;
 
   const isOwnProfile = !user_id || state.currentUser?.user_id === user_id;
-  // const targetUser = profileUser;
 
   return (
     <div>
