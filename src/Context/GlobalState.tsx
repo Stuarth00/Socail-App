@@ -43,7 +43,7 @@ interface AppProviderType {
   loginUser: (email: string, password: string) => Promise<Token>;
   getCurrentAccount: () => Promise<User>;
   editAccount: (updates: Partial<UserProfile>) => Promise<UserProfile>;
-  createPost: (description: Post) => Promise<Post>;
+  createPost: (description: string, image_base64: string) => Promise<Post>;
   getPost: () => Promise<Post[]>;
   getAllPosts: () => Promise<Post[]>;
   getAllUsers: () => Promise<User[]>;

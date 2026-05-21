@@ -76,19 +76,25 @@ function PostProfile({
                 key={photo.post_id}
                 className="border border-gray-300 rounded overflow-hidden shadow-lg break-inside-avoid"
               >
-                {photo.content_url
+                {photo.content_urls?.map((url, index) => (
+                  <img key={index} src={url} alt={photo.description} />
+                ))}
+                {/* {photo.content_urls
 
-                  ?.filter((media) => media.content_url)
+                  ?.filter(
+                    (media) =>
+                      media.content_urls && media.content_urls.length > 0,
+                  )
 
                   .map((media) => (
                     <img
                       key={media.media_id}
-                      src={media.content_url!}
+                      src={media.content_urls?.[0] || ""}
                       alt={photo.description}
                       className="w-full h-auto rounded-t hoverImg"
                     />
                   ))}
-                ;<p>{photo.description}</p>
+                ;<p>{photo.description}</p> */}
               </div>
             ))}
           </div>

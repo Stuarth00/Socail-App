@@ -1,4 +1,4 @@
-import type { Post, NewUser, Token, UserProfile } from "../Types/Interafaces";
+import type { NewUser, Token, UserProfile } from "../Types/Interafaces";
 
 export interface ToggleFollowResponse {
   action: 'followed' | 'unfollowed';
@@ -47,7 +47,6 @@ export const loginUser = async (email: string, password: string) => {
 // Getting current account 
 export const getCurrentAccount = async () => {
     const token  = localStorage.getItem('token');
-    console.log(token)
     const response = await fetch('http://localhost:3001/api/users/me', {
         method: 'GET', 
         headers: { 'Authorization': `Bearer ${token}`}, 
@@ -71,19 +70,27 @@ export const editAccount = async (updates : Partial<UserProfile>) => {
 }
 
 //Creating Posts
-export const createPost = async (description : Post) => { 
-    const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:3001/api/posts/create-post', {
-        method: 'POST', 
-        headers: {
-            'Content-Type': 'application/json', 
-            'Authorization': `Bearer ${token}`
-        }, 
-        body: JSON.stringify(description)
-    });
-    // if(!response.ok) throw new Error('Post creation failed');
-    return handleResponse(response);
-}
+export const createPost = async (
+  description: string,
+  image_base64: string
+) => {
+  const token = localStorage.getItem("token");
+  const response = await fetch(
+    "http://localhost:3001/api/posts/create-post",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        description,
+        image_base64,
+      }),
+    }
+  );
+  return handleResponse(response);
+};
 
 //Getting posts by user logged in
 export const getPost = async () => {

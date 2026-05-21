@@ -1,6 +1,5 @@
 import { useState, useContext, type ChangeEvent } from "react";
 import { AppContext } from "../../Context/GlobalState";
-import type { Post } from "../../Types/Interafaces";
 import heic2any from "heic2any";
 
 function CreationPost() {
@@ -42,7 +41,6 @@ function CreationPost() {
       }
     }
 
-    // Your existing logic continues here...
     if (selectedFile.type.startsWith("image/")) {
       setFile(selectedFile);
       const render = new FileReader();
@@ -57,13 +55,14 @@ function CreationPost() {
     e.preventDefault();
     console.log("Submitting post with image URL:", imageUrl);
 
-    const newPost: Post = {
-      content_url: [{ content_url: imageUrl }],
-      description: description,
-    };
+    // const newPost: Post = {
+    //   content_url: [{ content_url: imageUrl }],
+    //   description: description,
+    // };
 
     try {
-      const createdPost = await createPost(newPost);
+      if (!imageUrl) return;
+      const createdPost = await createPost(description, imageUrl);
       dispatch({
         type: "CREATE_POST",
         payload: createdPost,
