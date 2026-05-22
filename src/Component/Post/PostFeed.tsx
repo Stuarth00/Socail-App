@@ -9,27 +9,36 @@ interface PostProps {
   post: {
     post_id?: string;
     author_id?: string;
+    author_avatar?: string;
     author_first_name?: string;
     author_last_name?: string;
     description?: string;
-    content_url?: Media[]; // Now an array of Media objects
-    likes?: Like[]; // Now an array of Like objects
-    comments?: PostComment[]; // Your existing Comment interface
+    media?: Media[];
+    likes?: Like[];
+    comments?: PostComment[];
     created_at?: string;
   };
+  handleNavigateToUserId: (userId: string) => void;
 }
 
-function PostFeed({ post }: PostProps) {
+function PostFeed({ post, handleNavigateToUserId }: PostProps) {
   // const { state } = useContext(AppContext);
-  const firstMediaUrl = post.content_url?.[0]?.content_url ?? "";
+  const first_media_url =
+    post.media && post.media.length > 0 ? post.media[0].content_url : null;
 
   return (
     <article className="border rounded-lg mb-16">
       <PostHeader
+        avatar={post.author_avatar || "Unknown"}
         username={post.author_first_name || "Unknown"}
         lastname={post.author_last_name || "Unknown"}
+        handleNavigateToUserId={handleNavigateToUserId}
+        author_id={post.author_id || ""}
       />
-      <PostContent content_url={firstMediaUrl} description={post.description} />
+      <PostContent
+        content_url={first_media_url!}
+        description={post.description}
+      />
       {/* <PostActions likes={post.likes} comments={post.comments} /> */}
     </article>
   );

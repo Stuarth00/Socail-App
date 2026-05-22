@@ -1,21 +1,34 @@
 function PostHeader({
+  avatar,
   username,
   lastname,
+  handleNavigateToUserId,
+  author_id,
 }: {
+  avatar: string;
   username: string;
   lastname: string;
+  handleNavigateToUserId: (userId: string) => void;
+  author_id: string;
 }) {
   return (
     <header className="flex items-center gap-3 p-4">
       <img
-        // src={avatar}
+        src={avatar}
         alt="UserProfile"
-        className="w-10 h-10 rounded-full object-cover"
+        className="w-20 h-20 rounded-full object-cover"
       />
-      <p className="font-semibold text-sm">
-        {username}
-        {lastname}
-      </p>
+      <span
+        key={author_id}
+        onClick={() => handleNavigateToUserId(author_id)}
+        style={{
+          cursor: "pointer",
+          display: "block",
+          marginBottom: "5px",
+        }}
+      >
+        {username} {lastname}
+      </span>
     </header>
   );
 }

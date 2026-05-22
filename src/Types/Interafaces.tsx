@@ -35,7 +35,7 @@ export interface Post {
   author_first_name?: string;
   author_last_name?: string;
   description?: string;
-  content_urls: Media[];
+  media?: Media[];
   likes?: Like[];
   comments?: PostComment[];
   created_at?: string;
@@ -47,8 +47,8 @@ export interface PostComment {
 }
 
 export interface Media {
-  media_id?: number;
-  content_urls?: string[] | null;
+  media_id?: string;
+  content_url?: string;
 }
 
 export interface Like {

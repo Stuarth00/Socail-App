@@ -1,6 +1,7 @@
 import { useState, useContext, type ChangeEvent } from "react";
 import { AppContext } from "../../Context/GlobalState";
 import type { UserProfile } from "../../Types/Interafaces";
+import heic2any from "heic2any";
 
 function EditProfile() {
   const {
@@ -13,7 +14,7 @@ function EditProfile() {
 
   const [formData, setFormData] = useState<UserProfile>(
     state.currentUser || {
-      id: "",
+      user_id: "",
       first_name: "",
       last_name: "",
       email: "",
@@ -26,23 +27,55 @@ function EditProfile() {
       gender: "",
     },
   );
+  const [, setFile] = useState<File | null>(null);
   const handleCancelSubmission = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     handleUserProfileClick();
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    let selectedFile = e.target.files ? e.target.files[0] : null;
+    if (!selectedFile) return;
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setFormData((prev) => ({
-        ...prev,
-        avatar: reader.result as string,
-      }));
-    };
-    reader.readAsDataURL(file);
+    // 1. Check for HEIC specifically
+    if (
+      selectedFile.name.toLowerCase().endsWith(".heic") ||
+      selectedFile.type === "image/heic"
+    ) {
+      try {
+        // 2. Convert HEIC to JPEG blob
+        const convertedBlob = await heic2any({
+          blob: selectedFile,
+          toType: "image/jpeg",
+          quality: 0.8,
+        });
+
+        // 3. Create a new File object from the blob so it has a name
+        selectedFile = new File(
+          [Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob],
+          selectedFile.name.replace(/\.[^/.]+$/, ".jpg"),
+          { type: "image/jpeg" },
+        );
+      } catch (error) {
+        console.log(error);
+        alert("Brave/Chrome don't support HEIC yet. Please try a PNG or JPEG!");
+        e.target.value = ""; // Clear the input
+        return;
+      }
+    }
+
+    if (selectedFile.type.startsWith("image/")) {
+      setFile(selectedFile);
+      const render = new FileReader();
+      render.onloadend = () => {
+        const imageBase64 = render.result as string;
+        setFormData((prev) => ({
+          ...prev,
+          avatar: imageBase64,
+        }));
+      };
+      render.readAsDataURL(selectedFile);
+    }
   };
 
   const handleChange = (
@@ -67,13 +100,13 @@ function EditProfile() {
       type: "UPDATE_PROFILE",
       payload: {
         ...formData,
-        id: state.currentUser?.id || crypto.randomUUID(),
+        user_id: state.currentUser?.user_id || crypto.randomUUID(),
         password: state.currentUser?.password || "",
       },
     });
     handleUserProfileClick();
     setFormData({
-      id: "",
+      user_id: "",
       first_name: "",
       last_name: "",
       email: "",

@@ -7,7 +7,7 @@ function PostContent({
 }) {
   return (
     <div>
-      {content_url?.[0] && <img src={content_url[0]} alt={description} />}
+      {content_url && <img src={content_url} alt={description} />}
       <p>{description}</p>
     </div>
   );

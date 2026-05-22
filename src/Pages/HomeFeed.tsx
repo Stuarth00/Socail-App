@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../Context/GlobalState";
 
 function HomeFeed() {
-  const { getAllPosts } = useContext(AppContext);
+  const { getAllPosts, handleNavigateToUserId } = useContext(AppContext);
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
@@ -25,7 +25,11 @@ function HomeFeed() {
       <Layout>
         <h1>Home Feed</h1>
         {posts.map((post) => (
-          <PostFeed key={post.post_id} post={post} />
+          <PostFeed
+            key={post.post_id}
+            post={post}
+            handleNavigateToUserId={handleNavigateToUserId}
+          />
         ))}
       </Layout>
     </div>

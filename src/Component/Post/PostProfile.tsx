@@ -29,18 +29,6 @@ function PostProfile({
     fetchPosts();
   }, [user_id, isOwnProfile]);
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const data: Post[] = await getPost();
-  //       setMyPosts(data);
-  //     } catch (err) {
-  //       console.error(err);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
-
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 640) setNumCols(2);
@@ -76,25 +64,14 @@ function PostProfile({
                 key={photo.post_id}
                 className="border border-gray-300 rounded overflow-hidden shadow-lg break-inside-avoid"
               >
-                {photo.content_urls?.map((url, index) => (
-                  <img key={index} src={url} alt={photo.description} />
+                {photo.media?.map((media, index) => (
+                  <img
+                    key={media.media_id || index}
+                    src={media.content_url}
+                    alt={photo.description || "Post image"}
+                    className="w-full h-auto rounded-t hoverImg"
+                  />
                 ))}
-                {/* {photo.content_urls
-
-                  ?.filter(
-                    (media) =>
-                      media.content_urls && media.content_urls.length > 0,
-                  )
-
-                  .map((media) => (
-                    <img
-                      key={media.media_id}
-                      src={media.content_urls?.[0] || ""}
-                      alt={photo.description}
-                      className="w-full h-auto rounded-t hoverImg"
-                    />
-                  ))}
-                ;<p>{photo.description}</p> */}
               </div>
             ))}
           </div>
