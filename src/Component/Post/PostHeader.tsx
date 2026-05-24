@@ -4,19 +4,21 @@ function PostHeader({
   lastname,
   handleNavigateToUserId,
   author_id,
+  created_at,
 }: {
   avatar: string;
   username: string;
   lastname: string;
   handleNavigateToUserId: (userId: string) => void;
   author_id: string;
+  created_at: string;
 }) {
   return (
     <header className="flex items-center gap-3 p-4">
       <img
         src={avatar}
         alt="UserProfile"
-        className="w-20 h-20 rounded-full object-cover"
+        className="w-15 h-15 rounded-full object-cover"
       />
       <span
         key={author_id}
@@ -29,6 +31,7 @@ function PostHeader({
       >
         {username} {lastname}
       </span>
+      <p>{created_at}</p>
     </header>
   );
 }

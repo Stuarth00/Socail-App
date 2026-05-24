@@ -3,7 +3,7 @@ import PostContent from "./PostContent";
 // import { useContext } from "react";
 // import { AppContext } from "../../Context/GlobalState";
 import type { Like, Media, PostComment } from "../../Types/Interafaces";
-// import PostActions from "./PostActions";
+import PostActions from "./PostActions";
 
 interface PostProps {
   post: {
@@ -34,12 +34,15 @@ function PostFeed({ post, handleNavigateToUserId }: PostProps) {
         lastname={post.author_last_name || "Unknown"}
         handleNavigateToUserId={handleNavigateToUserId}
         author_id={post.author_id || ""}
+        created_at={post.created_at || ""}
       />
-      <PostContent
-        content_url={first_media_url!}
+      <div className="border-b border-t">
+        <PostContent content_url={first_media_url!} />
+      </div>
+      <PostActions
         description={post.description}
+        likes={post.likes?.length || 0}
       />
-      {/* <PostActions likes={post.likes} comments={post.comments} /> */}
     </article>
   );
 }

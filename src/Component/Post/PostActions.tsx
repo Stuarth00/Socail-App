@@ -1,20 +1,35 @@
+import { Forward, Heart, MessageCircle } from "lucide-react";
+// {
+//   likes,
+//   comments,
+// }: {
+//   likes: number;
+//   comments: string[];
+// }
+
 function PostAction({
+  description,
   likes,
-  comments,
 }: {
+  description: string | undefined;
   likes: number;
-  comments: string[];
 }) {
   return (
     <div>
       <div>
-        <p>{likes} likes</p>
-        <p>{comments}</p>
+        <button>
+          <Heart />
+          <span>{likes}</span>
+        </button>
+        <button>
+          <MessageCircle />
+        </button>
+        <button>
+          <Forward />
+        </button>
       </div>
       <div>
-        <button>Like</button>
-        <button>Comment</button>
-        <button>Share</button>
+        <p>{description}</p>
       </div>
     </div>
   );

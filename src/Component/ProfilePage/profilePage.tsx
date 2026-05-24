@@ -4,7 +4,8 @@ import { AppContext } from "../../Context/GlobalState";
 import Modal from "../Authorization/Modal";
 import CreationPost from "./creationPost";
 import type { UserProfile } from "../../Types/Interafaces";
-import FollowList from "../FollowList/FollowList";
+import FollowList from "../ActionUser/FollowList";
+import Avatar from "../ActionUser/Avatar";
 
 function ProfilePage({
   children,
@@ -25,7 +26,7 @@ function ProfilePage({
   } = useContext(AppContext);
 
   const [actionUser, setActionUser] = useState<
-    "post" | "followerList" | "followingList" | null
+    "post" | "followerList" | "followingList" | "avatar" | null
   >(null);
 
   const isFollowing =
@@ -64,67 +65,80 @@ function ProfilePage({
       {/* {state.currentUser ? ( */}
       <div className="flex flex-col gap-8">
         <div className="flex-shrink-0">
-          {isOwnProfile ? (
-            <button
-              onClick={handleLogOut}
-              className="rounded-md border border-gray-300 px-4 py-1.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
-            >
-              Log Out
-            </button>
-          ) : null}
+          {isOwnProfile && (
+            <div className="flex justify-end w-full">
+              <button
+                onClick={handleLogOut}
+                className="rounded-md border border-gray-600 px-4 py-1.5 text-sm font-semibold text-gray-300 transition hover:bg-gray-800 hover:text-white active:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-[#393b47]"
+              >
+                Log Out
+              </button>
+            </div>
+          )}
         </div>
-        <header className="flex flex-col items-center gap-6 border-b pb-10 sm:flex-row sm:itmes-start sm:gap-12">
+        <header className="flex flex-col items-center gap-6 border-b border-gray-700 pb-10 sm:flex-row sm:items-start sm:gap-12">
           <div className="flex-shrink-0">
-            <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-gray-200 sm:h-32 sm:w-32">
-              <img
-                src={profileUser?.avatar || "/default-avatar.png"}
-                alt="Profile"
-                className="h-full w-full object-cover"
-              />
+            <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-gray-200 sm:h-32 sm:w-32 bg-gray-800">
+              <a onClick={() => setActionUser("avatar")}>
+                <img
+                  src={profileUser?.avatar || "/default-avatar.png"}
+                  alt={`${profileUser?.first_name || "User"}'s profile picture`}
+                  className="h-full w-full object-cover"
+                  loading="eager"
+                />
+              </a>
             </div>
           </div>
 
-          <div className="flex flex-grow flex-col items-center text-center sm:items-start sm:text-left">
+          <div className="flex flex-grow flex-col items-center text-center sm:items-start sm:text-left w-full">
             <div className="flex flex-col gap-1">
               <h1 className="text-2xl font-semibold text-gray-300 sm:text-3xl">
                 {profileUser?.first_name} {profileUser?.last_name}'s Profile
               </h1>
-              <span
-                id="myClickableSpan"
-                style={{
-                  cursor: "pointer",
-                  // color: "blue",
-                  // textDecoration: "underline",
-                }}
-                onClick={() => setActionUser("followerList")}
-              >
-                Followers: {profileUser?.followers?.length || 0}
-              </span>
-              <span
-                id="myClickableSpan"
-                style={{
-                  cursor: "pointer",
-                  // color: "blue",
-                  // textDecoration: "underline",
-                }}
-                onClick={() => setActionUser("followingList")}
-              >
-                Following: {profileUser?.following?.length || 0}
-              </span>
-              <p className="text-gray-400">{profileUser?.email}</p>
-              <p className="text-gray-400">{profileUser?.location}</p>
-              <p className="text-gray-400">{profileUser?.interests}</p>
-              <p className="text-gray-400">About Me: {profileUser?.about_me}</p>
-              <div className="mt-4 flex gap-6 text-sm">
-                <span>
-                  {profileUser?.date_of_birth &&
-                    differenceInYears(
-                      new Date(),
 
-                      new Date(profileUser.date_of_birth),
-                    )}
-                </span>
+              <div className="flex gap-4 text-sm font-medium mt-1">
+                <button
+                  onClick={() => setActionUser("followerList")}
+                  className="text-gray-300 hover:text-gray-400  transition-colors focus:outline-none"
+                >
+                  Followers{" "}
+                  <span className="font-bold text-gray-100">
+                    {profileUser?.followers?.length || 0}
+                  </span>
+                </button>
+                <span className="text-gray-600">|</span>
+                <button
+                  onClick={() => setActionUser("followingList")}
+                  className="text-gray-300 hover:text-gray-400  transition-colors focus:outline-none"
+                >
+                  Following{" "}
+                  <span className="font-bold text-gray-100">
+                    {profileUser?.following?.length || 0}
+                  </span>
+                </button>
               </div>
+              <div className="mt-2 space-y-1 text-sm text-gray-400">
+                <p className="hover:text-gray-300 transition-colors">
+                  {profileUser?.email}
+                </p>
+                {profileUser?.location && <p>📍 {profileUser.location}</p>}
+                {profileUser?.interests && (
+                  <p>🎨 Interests: {profileUser.interests}</p>
+                )}
+                {profileUser?.about_me && (
+                  <p className="italic mt-2 text-gray-300">
+                    " {profileUser.about_me} "
+                  </p>
+                )}
+              </div>
+              <span>
+                {profileUser?.date_of_birth &&
+                  differenceInYears(
+                    new Date(),
+
+                    new Date(profileUser.date_of_birth),
+                  )}
+              </span>
             </div>
             {/* Action buttons */}
             <div className="flex flex-row gap-8 mt-6">
@@ -145,7 +159,14 @@ function ProfilePage({
                 </>
               )}
               {!isOwnProfile && (
-                <button onClick={() => handleFollow()}>
+                <button
+                  onClick={handleFollow}
+                  className={`rounded-md px-6 py-2 text-sm font-semibold transition-all shadow-sm focus:outline-none focus:ring-2 ${
+                    isFollowing
+                      ? "bg-gray-700 text-gray-200 hover:bg-red-900 hover:text-white hover:border-red-700"
+                      : "bg-gray-500 text-white hover:bg-gray-700"
+                  }`}
+                >
                   {isFollowing ? "Unfollow" : "Follow"}
                 </button>
               )}
@@ -155,26 +176,28 @@ function ProfilePage({
         <LoadingSpinner />
 
         <main className="w-full">{children}</main>
-        {/* Add more profile details here */}
+        {/* to add more profile details here */}
       </div>
 
-      {/* {actionUser && (
-        <Modal onClose={() => setActionUser(null)}>
-          {actionUser === "post" ? <CreationPost /> : <FollowList />}
-        </Modal>
-      )} */}
       {actionUser && (
         <Modal onClose={() => setActionUser(null)}>
+          <button
+            className="absolute top-0 right-0 m-4 text-gray-500 hover:text-gray-700"
+            onClick={() => setActionUser(null)}
+          >
+            {" "}
+            X{" "}
+          </button>
           {(() => {
             switch (actionUser) {
               case "post":
                 return <CreationPost />;
               case "followerList":
-                // You can pass a prop to reuse the same list component with different data
                 return (
                   <FollowList
                     type="followers"
                     user_id={profileUser?.user_id ?? ""}
+                    onClose={() => setActionUser(null)}
                   />
                 );
               case "followingList":
@@ -182,6 +205,15 @@ function ProfilePage({
                   <FollowList
                     type="following"
                     user_id={profileUser?.user_id ?? ""}
+                    onClose={() => setActionUser(null)}
+                  />
+                );
+              case "avatar":
+                return (
+                  <Avatar
+                    type="avatar"
+                    avatar={profileUser?.avatar ?? ""}
+                    onClose={() => setActionUser(null)}
                   />
                 );
               default:
