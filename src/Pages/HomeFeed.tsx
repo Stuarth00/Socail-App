@@ -21,7 +21,7 @@ function HomeFeed() {
   }, []);
 
   return (
-    <div className="mt-4">
+    <div className="mt-16">
       <Layout>
         <h1>Home Feed</h1>
         {posts.map((post) => (

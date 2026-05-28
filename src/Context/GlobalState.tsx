@@ -23,6 +23,8 @@ import {
   toggleFollowing,
   getFollowersList,
   getFollowingList,
+  toggleLike,
+  getLikesByPostId,
   type ToggleFollowResponse,
 } from "./Requests";
 
@@ -58,6 +60,20 @@ interface AppProviderType {
     id: string,
     type: "followers" | "following",
   ) => Promise<User[]>;
+  toggleLike: (post_id: string) => Promise<{
+    success: boolean;
+    action: "liked" | "unliked";
+    is_liked: boolean;
+    likesCount: number;
+  }>;
+  getLikesByPostId: (post_id: string) => Promise<
+    {
+      user_id: string;
+      first_name: string;
+      last_name: string;
+      avatar?: string;
+    }[]
+  >;
 }
 
 const initialState: State = {
@@ -87,17 +103,6 @@ function appReducer(state: State, action: Action): State {
         ...state,
         currentUser: action.payload,
       };
-    case "REGISTER_USER":
-      console.log("Reducer called with action:", action);
-      console.log("Initial state:", initialState);
-      return {
-        ...state,
-        users: [...state.users, action.payload],
-        currentUser: action.payload,
-      };
-    case "LOGIN_USER":
-      console.log("Reducer called with action:", action);
-      return { ...state, currentUser: action.payload };
     case "LOGOUT":
       console.log("Reducer called with action:", action);
       return { ...state, currentUser: null };
@@ -143,14 +148,7 @@ function appReducer(state: State, action: Action): State {
 export const AppContext = createContext<AppProviderType>({} as AppProviderType);
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  //useReducer
-  const KEY = "my_app_state";
-
-  const init = (initialValue: State): State => {
-    const persisted = localStorage.getItem(KEY);
-    return persisted ? JSON.parse(persisted) : initialValue;
-  };
-  const [state, dispatch] = useReducer(appReducer, initialState, init);
+  const [state, dispatch] = useReducer(appReducer, initialState);
   //Routes
   const navigate = useNavigate();
 
@@ -178,21 +176,6 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     };
     checkAuth();
   }, []);
-
-  //Storing in localStorage
-  useEffect(() => {
-    const stateToPersist = {
-      ...state,
-      users: state.users.map((user) => ({
-        ...user,
-        avatar: "",
-      })),
-    };
-    const timeout = setTimeout(() => {
-      localStorage.setItem(KEY, JSON.stringify(stateToPersist));
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [state]);
 
   //Spinner
   const [loading, setLoading] = useState<boolean>(false);
@@ -257,6 +240,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         toggleFollowing,
         getFollowersList,
         getFollowingList,
+        toggleLike,
+        getLikesByPostId,
       }}
     >
       {children}

@@ -25,9 +25,10 @@ function PostFeed({ post, handleNavigateToUserId }: PostProps) {
   // const { state } = useContext(AppContext);
   const first_media_url =
     post.media && post.media.length > 0 ? post.media[0].content_url : null;
+  const post_id = post.post_id || "Unknown";
 
   return (
-    <article className="border rounded-lg mb-16">
+    <article className="w-full max-w-lg mx-auto bg-white border border-gray-100 rounded-xl shadow-sm bd-12 overflow-hidden mb-6">
       <PostHeader
         avatar={post.author_avatar || "Unknown"}
         username={post.author_first_name || "Unknown"}
@@ -36,12 +37,13 @@ function PostFeed({ post, handleNavigateToUserId }: PostProps) {
         author_id={post.author_id || ""}
         created_at={post.created_at || ""}
       />
-      <div className="border-b border-t">
+      <div className="border-b border-t bg-gray-50">
         <PostContent content_url={first_media_url!} />
       </div>
       <PostActions
         description={post.description}
-        likes={post.likes?.length || 0}
+        likes={post.likes || []}
+        post_id={post_id}
       />
     </article>
   );

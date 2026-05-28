@@ -13,7 +13,6 @@ if(response.status === 401) {
   if(!response.ok) throw new Error('Request failed');
   const data = await response.json();
     
-    // console.log("Response Values:", data);
   return data;
 }
 
@@ -25,10 +24,14 @@ export const registerUser = async (formData: NewUser) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(formData)
   });
-  if (response.status !== 200) throw new Error('Signup failed');
-  const token: Token = await response.json();
-  localStorage.setItem('token', token.token);
-  return token; // returns the created user
+  if(response.status === 409) {
+  throw new Error('Email already in use');
+}
+  if(!response.ok) throw new Error('Signup failed');
+  
+  const { token } = await response.json();
+  localStorage.setItem('token', token); 
+  return token;
 }
 
 // Login function to authenticate a user
@@ -41,6 +44,7 @@ export const loginUser = async (email: string, password: string) => {
     if (response.status !== 200) throw new Error('Login failed');
     const token : Token  = await response.json();
     localStorage.setItem('token', token.token);
+    console.log(token.token)
     return token; 
 }
 
@@ -176,6 +180,30 @@ export const getFollowingList = async (user_id : string, type: "followers" | "fo
       'Content-Type': 'application/json', 
       'Authorization': `Bearer ${token}`
     }, 
+  });
+  return handleResponse(response);
+}
+
+export const toggleLike = async (post_id: string) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`http://localhost:3001/api/like/${post_id}/toggle-like`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+  return handleResponse(response);
+}
+
+export const getLikesByPostId = async (post_id: string) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`http://localhost:3001/api/like/${post_id}/likes`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
   });
   return handleResponse(response);
 }

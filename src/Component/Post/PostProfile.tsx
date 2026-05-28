@@ -35,7 +35,7 @@ function PostProfile({
       else setNumCols(3);
     };
     window.addEventListener("resize", handleResize);
-    handleResize(); // Set initial column count based on current window size
+    handleResize();
 
     return () => {
       window.removeEventListener("resize", handleResize);

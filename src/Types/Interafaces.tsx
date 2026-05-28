@@ -39,6 +39,7 @@ export interface Post {
   likes?: Like[];
   comments?: PostComment[];
   created_at?: string;
+  is_liked?: boolean;
 }
 
 export interface PostComment {
@@ -52,5 +53,6 @@ export interface Media {
 }
 
 export interface Like {
-  username: string;
+  user_id: string;
+  first_name: string;
 }

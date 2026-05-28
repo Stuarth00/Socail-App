@@ -19,7 +19,6 @@ function ProfilePage({
   const {
     state,
     dispatch,
-    asyncSimulate,
     LoadingSpinner,
     handleEditProfileClick,
     toggleFollowing,
@@ -34,10 +33,9 @@ function ProfilePage({
     state.currentUser?.following?.includes(profileUser.user_id);
 
   const handleLogOut = () => {
-    asyncSimulate(() => {
-      dispatch({
-        type: "LOGOUT",
-      });
+    localStorage.removeItem("token");
+    dispatch({
+      type: "LOGOUT",
     });
   };
 
@@ -62,7 +60,6 @@ function ProfilePage({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      {/* {state.currentUser ? ( */}
       <div className="flex flex-col gap-8">
         <div className="flex-shrink-0">
           {isOwnProfile && (
@@ -83,7 +80,7 @@ function ProfilePage({
                 <img
                   src={profileUser?.avatar || "/default-avatar.png"}
                   alt={`${profileUser?.first_name || "User"}'s profile picture`}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover cursor-pointer hover:brightness-90 transition"
                   loading="eager"
                 />
               </a>
@@ -176,7 +173,6 @@ function ProfilePage({
         <LoadingSpinner />
 
         <main className="w-full">{children}</main>
-        {/* to add more profile details here */}
       </div>
 
       {actionUser && (
