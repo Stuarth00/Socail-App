@@ -5,6 +5,7 @@ import Modal from "../Authorization/Modal";
 import LikeList from "../ActionUser/LikeList";
 import CommentList from "../ActionUser/CommentList";
 import SharePost from "../ActionUser/SharePost";
+import type { Like, Media, PostComment } from "../../Types/Interafaces";
 
 interface LikeUser {
   user_id: string;
@@ -14,13 +15,28 @@ interface LikeUser {
 }
 
 function PostAction({
+  // content_url,
   description,
   likes,
   post_id,
+  post,
 }: {
+  content_url: string;
   description: string | undefined;
   likes: { user_id: string }[] | undefined;
   post_id: string;
+  post: {
+    post_id?: string;
+    author_id?: string;
+    author_avatar?: string;
+    author_first_name?: string;
+    author_last_name?: string;
+    description?: string;
+    media?: Media[];
+    likes?: Like[];
+    comments?: PostComment[];
+    created_at?: string;
+  };
 }) {
   const [likesCount, setLikesCount] = useState(likes?.length || 0);
   const { toggleLike, state, getLikesByPostId } = useContext(AppContext);
@@ -62,7 +78,7 @@ function PostAction({
 
   const fetchLikesList = async () => {
     try {
-      const data: LikeUser[] = await getLikesByPostId(post_id);
+      const data: LikeUser[] = await getLikesByPostId(post_id.toString());
       setLikesList(data);
     } catch (err) {
       console.error("Failed to fetch likes list", err);
@@ -75,7 +91,9 @@ function PostAction({
         return <LikeList data={likesList} />;
 
       case "comment":
-        return <CommentList />;
+        return (
+          <CommentList post={post} isLiked={isLiked} likesCount={likesCount} />
+        );
 
       case "share":
         return <SharePost />;
@@ -85,10 +103,6 @@ function PostAction({
   return (
     <div>
       <div className="max-w-md p-4 border border-gray-100 rounded-xl shadow-sm bg-white">
-        <div className="mb-3">
-          <p className="text-gray-800 text-sm leading-relaxed">{description}</p>
-        </div>
-
         <div className="flex items-center gap-6 pt-2 border-t border-gray-50">
           <div
             className="flex items-center gap-1.5 group cursor-pointer"
@@ -143,6 +157,10 @@ function PostAction({
               5
             </span>
           </div>
+        </div>
+
+        <div className="mb-3">
+          <p className="text-gray-800 text-sm leading-relaxed">{description}</p>
         </div>
 
         <div className="mt-3 pt-2 border-t border-gray-100">

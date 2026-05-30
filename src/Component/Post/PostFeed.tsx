@@ -41,9 +41,11 @@ function PostFeed({ post, handleNavigateToUserId }: PostProps) {
         <PostContent content_url={first_media_url!} />
       </div>
       <PostActions
+        content_url={first_media_url!}
         description={post.description}
         likes={post.likes || []}
         post_id={post_id}
+        post={post}
       />
     </article>
   );
