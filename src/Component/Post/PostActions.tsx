@@ -139,7 +139,7 @@ function PostAction({
               <MessageCircle className="w-5 h-5 text-gray-600 transition-transform group-hover:scale-110" />
             </button>
             <span className="text-xs font-semibold text-gray-600 group-hover:text-gray-900">
-              2
+              {post.comments ? post.comments.length : 0}
             </span>
           </div>
 
@@ -168,12 +168,18 @@ function PostAction({
             onClick={() => setActionClicked("comment")}
             className="text-xs font-medium text-gray-400 hover:underline mb-1 block"
           >
-            View all 2 comments
+            {post.comments && post.comments.length > 0
+              ? `View all ${post.comments.length} comments`
+              : "No comments yet. Be the first to comment!"}
           </button>
-          <p className="text-xs text-gray-700">
-            <strong className="font-semibold mr-1">alex_dev</strong> Much better
-            in horizontal! 👑
-          </p>
+          {post.comments && post.comments[0] && (
+            <p className="text-xs text-gray-700">
+              <strong className="font-black mr-1">
+                {post.comments[0].username}
+              </strong>
+              {post.comments[0].text}
+            </p>
+          )}
         </div>
       </div>
 

@@ -25,6 +25,7 @@ import {
   getFollowingList,
   toggleLike,
   getLikesByPostId,
+  addComment,
   type ToggleFollowResponse,
 } from "./Requests";
 
@@ -74,6 +75,15 @@ interface AppProviderType {
       avatar?: string;
     }[]
   >;
+  addComment: (
+    post_id: string,
+    text: string,
+  ) => Promise<{
+    comment: {
+      post_id: string;
+      text: string;
+    };
+  }>;
 }
 
 const initialState: State = {
@@ -242,6 +252,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         getFollowingList,
         toggleLike,
         getLikesByPostId,
+        addComment,
       }}
     >
       {children}

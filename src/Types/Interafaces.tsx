@@ -43,7 +43,9 @@ export interface Post {
 }
 
 export interface PostComment {
+  comment_id?: string;
   username?: string;
+  avatar?: string;
   text?: string;
 }
 

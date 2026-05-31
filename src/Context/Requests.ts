@@ -207,3 +207,16 @@ export const getLikesByPostId = async (post_id: string) => {
   });
   return handleResponse(response);
 }
+
+export const addComment = async (post_id: string, comment: string) => {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`http://localhost:3001/api/comments/${post_id}/comments`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify({ comment })
+  });
+  return handleResponse(response);
+}

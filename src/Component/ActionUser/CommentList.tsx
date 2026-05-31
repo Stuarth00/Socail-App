@@ -1,6 +1,8 @@
 import { Heart, MessageCircle, Forward, Smile } from "lucide-react";
 import "../../index.css";
 import type { Media, Like, PostComment } from "../../Types/Interafaces";
+import { AppContext } from "../../Context/GlobalState";
+import { useContext } from "react";
 
 function CommentList({
   likesCount,
@@ -22,12 +24,30 @@ function CommentList({
     created_at?: string;
   };
 }) {
+  const { addComment } = useContext(AppContext);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const text = formData.get("comment") as string;
+    const form = e.currentTarget;
+
+    if (!text.trim() || !post.post_id) return;
+
+    try {
+      console.log("Adding comment:", { post_id: post.post_id, text });
+      console.log(formData.get("comment"));
+      console.log(text);
+      await addComment(post.post_id, text);
+      form.reset();
+    } catch (error) {
+      console.error("Failed to add comment:", error);
+    }
+  };
+
   return (
-    // Backdrop overlay
     <div>
-      {/* Main Modal Container */}
-      <div className="w-full max-w-5xl h-[85vh] max-h-[700px] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
-        {/* ================= LEFT SIDE: MEDIA CONTENT ================= */}
+      <div className="w-full max-w-6xl h-[85vh] max-h-[750px] bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
         <div className="w-full md:w-[55%] h-1/2 md:h-full bg-black flex items-center justify-center relative select-none border-b md:border-b-0 md:border-r border-gray-100">
           <img
             src={
@@ -40,11 +60,9 @@ function CommentList({
           />
         </div>
 
-        {/* ================= RIGHT SIDE: INTERACTION SIDEBAR ================= */}
-        <div className="w-full md:w-[45%] h-1/2 md:h-full flex flex-col bg-white">
-          {/* 1. Header (Sticky Top) */}
+        <div className="w-full md:w-[45%] h-1/2 md:h-full flex flex-col bg-white min-w-0">
+          {/* Header */}
           <div className="p-4 border-b border-gray-100 flex items-center justify-between shrink-0">
-            {/* Reuse your <PostHeader /> here */}
             <div className="flex items-center gap-3">
               <img
                 src={post.author_avatar}
@@ -60,55 +78,59 @@ function CommentList({
             </div>
           </div>
 
-          {/* 2. Scrollable Comments Section */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
-            {/* Post Description (Acts as the very first "comment") */}
-            <div className="flex items-start gap-3 pb-3 border-b border-gray-100">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-gray-50/50">
+            <div className="flex items-start gap-3 pb-3 border-b border-gray-100 min-w-0">
               <img
                 src={post.author_avatar}
                 className="w-8 h-8 rounded-full object-cover shrink-0"
                 alt=""
               />
-              <p className="text-sm text-gray-800 leading-relaxed">
-                <strong className="font-semibold mr-1.5">
-                  {post.author_first_name}
-                </strong>
-                {post.description}
-              </p>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-gray-800 leading-relaxed break-words">
+                  <strong className="font-semibold mr-1.5">
+                    {post.author_first_name}
+                  </strong>
+                  {post.description}
+                </p>
+              </div>
             </div>
 
-            {/* Simulated List of Comments */}
             <div className="space-y-4">
-              {/* Individual Comment Example */}
-              <div className="flex items-start gap-3 group">
-                <img
-                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
-                  className="w-8 h-8 rounded-full object-cover shrink-0"
-                  alt=""
-                />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-800">
-                    <strong className="font-semibold mr-1.5">sarah_k</strong>
-                    This layout implementation looks absolutely incredible! 🚀
-                  </p>
-                  <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
-                    <span>2h</span>
-                    <button className="font-semibold hover:text-gray-600">
-                      Reply
+              <div className="gap-3 group min-w-0">
+                {post.comments?.map((comment) => (
+                  <div
+                    key={comment.comment_id}
+                    className="flex items-start gap-3 min-w-0"
+                  >
+                    <img
+                      src={comment.avatar}
+                      className="w-8 h-8 rounded-full object-cover shrink-0"
+                      alt=""
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-gray-800 break-words leading-relaxed">
+                        <strong className="font-semibold mr-1.5">
+                          {comment.username}
+                        </strong>
+                        {comment.text}
+                      </p>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-400">
+                        <span>2h</span>
+                        <button className="font-semibold hover:text-gray-600">
+                          Reply
+                        </button>
+                      </div>
+                    </div>
+                    <button className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1 shrink-0">
+                      <Heart className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                </div>
-                <button className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1">
-                  <Heart className="w-3.5 h-3.5" />
-                </button>
+                ))}
               </div>
-              {/* Repeat your map() array over actual comments here */}
             </div>
           </div>
 
-          {/* 3. Replicated Action Bar (Sticky Bottom Area) */}
           <div className="border-t border-gray-100 p-4 bg-white shrink-0">
-            {/* Reuse your <PostActions /> or embed the horizontal bar here */}
             <div className="flex items-center gap-5 mb-2">
               <button className="hover:scale-110 transition-transform">
                 <Heart
@@ -124,37 +146,38 @@ function CommentList({
                 <Forward className="text-gray-700" />
               </button>
             </div>
-
-            {/* Likes Display */}
             <p className="text-sm font-semibold text-gray-900 mb-1">
               {likesCount} likes
+            </p>
+            <p className="text-sm font-semibold text-gray-900 mb-1">
+              {post.comments && post.comments.length > 0
+                ? `${post.comments.length} comments`
+                : "No comments yet"}
             </p>
             <p className="text-[10px] text-gray-400 uppercase tracking-wide font-medium">
               May 29, 2026
             </p>
           </div>
 
-          {/* 4. Input Comment Form (Sticky Bottom Boundary) */}
           <div className="border-t border-gray-100 px-4 py-3 bg-white shrink-0">
-            <form className="flex items-center gap-3">
-              {/* Emoji Picker Trigger (UX Bonus) */}
+            <form onSubmit={handleSubmit} className="flex items-start gap-3">
+              {"  "}
               <button
                 type="button"
-                className="text-gray-500 hover:text-gray-700 transition-colors hidden sm:block"
+                className="text-gray-500 hover:text-gray-700 transition-colors hidden sm:block mt-1"
               >
                 <Smile className="w-6 h-6" />
               </button>
-
               <textarea
-                // rows="1"
-                className="flex-1 text-sm text-gray-800 focus:outline-none resize-none max-h-20 py-1"
+                name="comment"
+                id="comment"
+                rows={3}
+                className="flex-1 text-sm text-gray-800 focus:outline-none resize-none min-h-[24px] max-h-60 py-1 overflow-y-auto overflow-x-hidden w-full field-sizing-content"
                 placeholder="Add a comment..."
-                style={{ height: "auto" }}
               />
-
               <button
                 type="submit"
-                className="text-sm font-semibold text-blue-500 hover:text-blue-700 disabled:opacity-40 transition-colors whitespace-nowrap"
+                className="text-sm font-semibold text-blue-500 hover:text-blue-700 disabled:opacity-40 transition-colors whitespace-nowrap mt-1"
               >
                 Post
               </button>
